@@ -56,27 +56,79 @@ SERVER_WASM_MAP = {
     'sequentialthinking': 'mcp_server_sequential_thinking.wasm',
 }
 
-# Test payloads
+# Test payloads for all 49 tools
 TEST_PAYLOADS = {
+    # Filesystem (14)
     'read_file': {'path': '/tmp/test.txt'},
     'read_text_file': {'path': '/tmp/test.txt'},
+    'read_media_file': {'path': '/tmp/test.jpg'},
+    'read_multiple_files': {'paths': ['/tmp/test.txt', '/tmp/test2.txt']},
     'write_file': {'path': '/tmp/test_write.txt', 'content': 'test' * 100},
+    'edit_file': {'path': '/tmp/test.txt', 'edits': [{'oldText': 'old', 'newText': 'new'}], 'dryRun': True},
+    'create_directory': {'path': '/tmp/test_dir'},
     'list_directory': {'path': '/tmp'},
+    'list_directory_with_sizes': {'path': '/tmp'},
+    'directory_tree': {'path': '/tmp'},
+    'move_file': {'source': '/tmp/test.txt', 'destination': '/tmp/test_moved.txt'},
+    'search_files': {'path': '/tmp', 'pattern': '*.txt'},
+    'get_file_info': {'path': '/tmp/test.txt'},
+    'list_allowed_directories': {},
+
+    # Git (12)
     'git_status': {'repo_path': '/tmp/test_repo'},
+    'git_diff_unstaged': {'repo_path': '/tmp/test_repo'},
+    'git_diff_staged': {'repo_path': '/tmp/test_repo'},
+    'git_diff': {'repo_path': '/tmp/test_repo', 'target': 'HEAD~1'},
+    'git_commit': {'repo_path': '/tmp/test_repo', 'message': 'test commit'},
+    'git_add': {'repo_path': '/tmp/test_repo', 'files': ['test.txt']},
+    'git_reset': {'repo_path': '/tmp/test_repo'},
     'git_log': {'repo_path': '/tmp/test_repo', 'max_count': 10},
-    'get_current_time': {'timezone': 'Asia/Seoul'},
-    'convert_time': {'source_timezone': 'Asia/Seoul', 'time': '12:00', 'target_timezone': 'America/New_York'},
-    'aggregate_list': {'items': [{'type': 'A', 'value': i} for i in range(100)]},
-    'get_image_info': {'image_path': '/tmp/test.jpg'},
-    'parse_logs': {'log_content': 'ERROR test\n' * 100, 'format_type': 'auto'},
-    'get_provider_info': {},
+    'git_create_branch': {'repo_path': '/tmp/test_repo', 'branch_name': 'test-branch'},
+    'git_checkout': {'repo_path': '/tmp/test_repo', 'branch_name': 'main'},
+    'git_show': {'repo_path': '/tmp/test_repo', 'revision': 'HEAD'},
+    'git_branch': {'repo_path': '/tmp/test_repo'},
+
+    # Fetch (1)
     'fetch': {'url': 'https://example.com'},
+
+    # Sequential Thinking (1)
     'sequentialthinking': {
         'thought': 'test thought',
         'nextThoughtNeeded': False,
         'thoughtNumber': 1,
         'totalThoughts': 1
     },
+
+    # Time (2)
+    'get_current_time': {'timezone': 'Asia/Seoul'},
+    'convert_time': {'source_timezone': 'Asia/Seoul', 'time': '12:00', 'target_timezone': 'America/New_York'},
+
+    # Summarize (3)
+    'summarize_text': {'text': 'test ' * 100, 'max_length': 50},
+    'summarize_documents': {'documents': [{'title': 'doc1', 'content': 'test ' * 50}]},
+    'get_provider_info': {},
+
+    # Log Parser (5)
+    'parse_logs': {'log_content': 'ERROR test\n' * 100, 'format_type': 'auto'},
+    'filter_entries': {'entries': [{'level': 'ERROR', 'message': 'test'}], 'min_level': 'WARNING'},
+    'compute_log_statistics': {'entries': [{'level': 'ERROR', 'message': 'test'} for _ in range(10)]},
+    'search_entries': {'entries': [{'message': 'test error'}], 'pattern': 'error'},
+    'extract_time_range': {'entries': [{'timestamp': '2024-01-01T00:00:00Z', 'message': 'test'}]},
+
+    # Data Aggregate (5)
+    'aggregate_list': {'items': [{'type': 'A', 'value': i} for i in range(100)]},
+    'merge_summaries': {'summaries': [{'key': 'test', 'value': 1}, {'key': 'test', 'value': 2}]},
+    'combine_research_results': {'results': [{'source': 'A', 'data': 'test1'}, {'source': 'B', 'data': 'test2'}]},
+    'deduplicate': {'items': [{'id': 1, 'name': 'test'}, {'id': 1, 'name': 'test'}], 'key_fields': ['id']},
+    'compute_trends': {'data': [{'timestamp': '2024-01-01', 'value': 10}, {'timestamp': '2024-01-02', 'value': 20}]},
+
+    # Image Resize (6)
+    'get_image_info': {'image_path': '/tmp/test.jpg'},
+    'resize_image': {'image_path': '/tmp/test.jpg', 'max_width': 800, 'max_height': 600},
+    'scan_directory': {'directory_path': '/tmp'},
+    'compute_image_hash': {'image_path': '/tmp/test.jpg'},
+    'compare_hashes': {'hash1': 'abc123', 'hash2': 'abc124'},
+    'batch_resize': {'image_paths': ['/tmp/test.jpg'], 'max_width': 800, 'max_height': 600},
 }
 
 
