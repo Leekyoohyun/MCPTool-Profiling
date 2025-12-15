@@ -74,15 +74,17 @@ SERVER_WASM_MAP = {
 def get_test_payloads():
     """Generate test payloads using real test data"""
 
-    # Real test files from TEST_DATA_PATH
-    test_text = str(TEST_DATA_PATH / 'files/test_medium.txt')
-    test_json = str(TEST_DATA_PATH / 'files/test_medium.json')
-    test_log = str(TEST_DATA_PATH / 'files/test_medium.log')
-    test_image = str(TEST_DATA_PATH / 'images/size_test/test_4mp.png')
-    test_large_image = str(TEST_DATA_PATH / 'images/size_test/test_9mp.png')
-    test_git_repo = str(TEST_DATA_PATH / 'git_repo')
-    test_files_dir = str(TEST_DATA_PATH / 'files')
-    test_images_dir = str(TEST_DATA_PATH / 'images/size_test')
+    # Use /tmp paths (WASM only has access to --dir=/tmp)
+    # Make sure to copy test data to /tmp first:
+    # cp -r ~/EdgeAgent-Profiling-for-coremark-v1/test_data/* /tmp/
+    test_text = '/tmp/files/test_medium.txt'
+    test_json = '/tmp/files/test_medium.json'
+    test_log = '/tmp/files/test_medium.log'
+    test_image = '/tmp/images/size_test/test_4mp.png'
+    test_large_image = '/tmp/images/size_test/test_9mp.png'
+    test_git_repo = '/tmp/git_repo'
+    test_files_dir = '/tmp/files'
+    test_images_dir = '/tmp/images/size_test'
 
     # Read actual log content for log parser tests
     try:
