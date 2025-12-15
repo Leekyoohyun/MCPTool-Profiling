@@ -46,19 +46,20 @@ def benchmark_network():
         print("⚠️  iperf3 not available, using default 100 Mbps")
         return 100.0
 
-    # Get server host from environment or use default
+    # Get server host and port from environment or use default
     server_host = os.getenv('IPERF_SERVER', '10.2.0.1')
+    server_port = os.getenv('IPERF_PORT', '5201')
 
-    print(f"Testing to server: {server_host}")
+    print(f"Testing to server: {server_host}:{server_port}")
     print("Make sure iperf3 server is running:")
-    print(f"  ssh {server_host} 'iperf3 -s -D'")
+    print(f"  ssh {server_host} 'iperf3 -s -p {server_port} -D'")
     print()
 
     try:
         # Run iperf3 client
-        cmd = ['iperf3', '-c', server_host, '-t', '5', '-J']
+        cmd = ['iperf3', '-c', server_host, '-p', server_port, '-t', '5', '-J']
         print("Running test (5 seconds)...")
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
 
         if result.returncode == 0:
             # Parse JSON output
