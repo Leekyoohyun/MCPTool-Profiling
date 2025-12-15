@@ -22,13 +22,13 @@ import time
 from pathlib import Path
 
 
-def measure_latency(target_host, port=22, runs=10):
+def measure_latency(target_host, port=80, runs=10):
     """
     Measure network latency using TCP connection time
 
     Args:
         target_host: Target IP or hostname
-        port: TCP port to connect to (default: 22 for SSH)
+        port: TCP port to connect to (default: 80 for HTTP)
         runs: Number of measurements to average
 
     Returns:
@@ -149,12 +149,13 @@ def main():
 
     # Get target server from environment
     target_server = os.getenv('IPERF_SERVER', '10.2.0.1')
+    latency_port = int(os.getenv('LATENCY_PORT', '80'))
 
     # Measure network bandwidth
     network_bw = benchmark_network()
 
     # Measure network latency
-    network_latency = measure_latency(target_server)
+    network_latency = measure_latency(target_server, port=latency_port)
 
     # Print results
     print("\n" + "="*60)
