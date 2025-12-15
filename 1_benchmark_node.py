@@ -74,9 +74,12 @@ def measure_latency(target_host, port=80, runs=10):
         return 50.0
 
 
-def benchmark_network():
+def benchmark_network(server_port='5201'):
     """
     Benchmark network bandwidth using iperf3
+
+    Args:
+        server_port: iperf3 server port (default: 5201)
 
     Returns:
         bandwidth_mbps: Network bandwidth in Mbps
@@ -99,9 +102,8 @@ def benchmark_network():
         print("⚠️  iperf3 not available, using default 100 Mbps")
         return 100.0
 
-    # Get server host and port from environment or use default
+    # Get server host from environment or use default
     server_host = os.getenv('IPERF_SERVER', '10.2.0.1')
-    server_port = os.getenv('IPERF_PORT', '5201')
 
     print(f"Testing to server: {server_host}:{server_port}")
     print("Make sure iperf3 server is running:")
@@ -155,22 +157,22 @@ def main():
         target_server = os.getenv('IPERF_SERVER', '10.2.0.1')
 
     if len(sys.argv) >= 3:
-        latency_port = int(sys.argv[2])
+        target_port = int(sys.argv[2])
     else:
-        latency_port = int(os.getenv('LATENCY_PORT', '80'))
+        target_port = int(os.getenv('TARGET_PORT', '80'))
 
     print(f"Target server: {target_server}")
-    print(f"Latency port: {latency_port}")
+    print(f"Target port: {target_port}")
     print()
 
     # Set environment variable for iperf3
     os.environ['IPERF_SERVER'] = target_server
 
-    # Measure network bandwidth
-    network_bw = benchmark_network()
+    # Measure network bandwidth (using same port for iperf3)
+    network_bw = benchmark_network(server_port=str(target_port))
 
-    # Measure network latency
-    network_latency = measure_latency(target_server, port=latency_port)
+    # Measure network latency (using same port)
+    network_latency = measure_latency(target_server, port=target_port)
 
     # Print results
     print("\n" + "="*60)
