@@ -260,6 +260,34 @@ def get_tools_by_server(server_name):
     return TOOLS.get(server_name, [])
 
 
+def determine_data_locality(server_name):
+    """
+    서버 이름을 기반으로 data locality 결정
+
+    Returns:
+        str: 'local_data', 'remote_data', 또는 'stateless'
+    """
+    # 로컬 데이터를 다루는 서버
+    local_data_servers = {
+        'filesystem',
+        'git',
+        'image_resize',
+    }
+
+    # 원격 데이터/API를 다루는 서버
+    remote_data_servers = {
+        'fetch',
+        'summarize',
+    }
+
+    if server_name in local_data_servers:
+        return 'local_data'
+    elif server_name in remote_data_servers:
+        return 'remote_data'
+    else:
+        return 'stateless'
+
+
 if __name__ == "__main__":
     # 테스트
     all_tools = get_all_tools()
