@@ -18,7 +18,59 @@ import socket
 import platform
 import os
 import json
+import time
 from pathlib import Path
+
+
+def measure_latency(target_host, port=22, runs=10):
+    """
+    Measure network latency using TCP connection time
+
+    Args:
+        target_host: Target IP or hostname
+        port: TCP port to connect to (default: 22 for SSH)
+        runs: Number of measurements to average
+
+    Returns:
+        latency_ms: Average latency in milliseconds
+    """
+    print("\n" + "="*60)
+    print("Network Latency Measurement")
+    print("="*60)
+    print(f"Measuring TCP connection time to {target_host}:{port}")
+    print()
+
+    latencies = []
+
+    for i in range(runs):
+        try:
+            start = time.time()
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(5)
+            sock.connect((target_host, port))
+            end = time.time()
+            sock.close()
+
+            latency_ms = (end - start) * 1000
+            latencies.append(latency_ms)
+
+        except (socket.timeout, socket.error) as e:
+            print(f"⚠️  Connection failed: {e}")
+            continue
+
+    if latencies:
+        avg_latency = sum(latencies) / len(latencies)
+        min_latency = min(latencies)
+        max_latency = max(latencies)
+
+        print(f"Measurements: {len(latencies)}/{runs}")
+        print(f"✓ Average latency: {avg_latency:.3f} ms")
+        print(f"  Min: {min_latency:.3f} ms, Max: {max_latency:.3f} ms")
+        return avg_latency
+    else:
+        print(f"⚠️  All measurements failed")
+        print(f"   Using default: 50.0 ms")
+        return 50.0
 
 
 def benchmark_network():
@@ -89,20 +141,27 @@ def main():
     hostname = socket.gethostname()
 
     print("="*60)
-    print(f"Network Bandwidth Measurement - {hostname}")
+    print(f"Network Benchmark - {hostname}")
     print("="*60)
     print(f"OS: {platform.system()} {platform.release()}")
     print(f"Machine: {platform.machine()}")
     print()
 
+    # Get target server from environment
+    target_server = os.getenv('IPERF_SERVER', '10.2.0.1')
+
     # Measure network bandwidth
     network_bw = benchmark_network()
+
+    # Measure network latency
+    network_latency = measure_latency(target_server)
 
     # Print results
     print("\n" + "="*60)
     print("Results")
     print("="*60)
     print(f"Network Bandwidth:  {network_bw:.2f} Mbps")
+    print(f"Network Latency:    {network_latency:.3f} ms")
 
     # Save to YAML
     node_data = {
@@ -110,6 +169,8 @@ def main():
         'os': platform.system(),
         'machine': platform.machine(),
         'network_bandwidth_mbps': network_bw,
+        'network_latency_ms': network_latency,
+        'target_server': target_server,
     }
 
     output_file = f'node_{hostname}.yaml'

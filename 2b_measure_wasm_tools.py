@@ -43,6 +43,21 @@ for path in WASM_PATH_CANDIDATES:
 if WASM_PATH is None:
     WASM_PATH = WASM_PATH_CANDIDATES[0]  # Default to first
 
+# Test data path
+TEST_DATA_CANDIDATES = [
+    Path.home() / "EdgeAgent-Profiling-for-coremark-v1/test_data",  # Nodes
+    Path.home() / "DDPS/undergraduated/CCGrid-2026/EdgeAgent/EdgeAgent-Profiling-for-coremark-v1/test_data",  # MacBook
+]
+
+TEST_DATA_PATH = None
+for path in TEST_DATA_CANDIDATES:
+    if path.exists():
+        TEST_DATA_PATH = path
+        break
+
+if TEST_DATA_PATH is None:
+    TEST_DATA_PATH = TEST_DATA_CANDIDATES[0]  # Default to first
+
 # Server name mapping
 SERVER_WASM_MAP = {
     'filesystem': 'mcp_server_filesystem.wasm',
@@ -56,80 +71,160 @@ SERVER_WASM_MAP = {
     'sequentialthinking': 'mcp_server_sequential_thinking.wasm',
 }
 
-# Test payloads for all 49 tools
-TEST_PAYLOADS = {
-    # Filesystem (14)
-    'read_file': {'path': '/tmp/test.txt'},
-    'read_text_file': {'path': '/tmp/test.txt'},
-    'read_media_file': {'path': '/tmp/test.jpg'},
-    'read_multiple_files': {'paths': ['/tmp/test.txt', '/tmp/test2.txt']},
-    'write_file': {'path': '/tmp/test_write.txt', 'content': 'test' * 100},
-    'edit_file': {'path': '/tmp/test.txt', 'edits': [{'oldText': 'old', 'newText': 'new'}], 'dryRun': True},
-    'create_directory': {'path': '/tmp/test_dir'},
-    'list_directory': {'path': '/tmp'},
-    'list_directory_with_sizes': {'path': '/tmp'},
-    'directory_tree': {'path': '/tmp'},
-    'move_file': {'source': '/tmp/test.txt', 'destination': '/tmp/test_moved.txt'},
-    'search_files': {'path': '/tmp', 'pattern': '*.txt'},
-    'get_file_info': {'path': '/tmp/test.txt'},
-    'list_allowed_directories': {},
+def get_test_payloads():
+    """Generate test payloads using real test data"""
 
-    # Git (12)
-    'git_status': {'repo_path': '/tmp/test_repo'},
-    'git_diff_unstaged': {'repo_path': '/tmp/test_repo'},
-    'git_diff_staged': {'repo_path': '/tmp/test_repo'},
-    'git_diff': {'repo_path': '/tmp/test_repo', 'target': 'HEAD~1'},
-    'git_commit': {'repo_path': '/tmp/test_repo', 'message': 'test commit'},
-    'git_add': {'repo_path': '/tmp/test_repo', 'files': ['test.txt']},
-    'git_reset': {'repo_path': '/tmp/test_repo'},
-    'git_log': {'repo_path': '/tmp/test_repo', 'max_count': 10},
-    'git_create_branch': {'repo_path': '/tmp/test_repo', 'branch_name': 'test-branch'},
-    'git_checkout': {'repo_path': '/tmp/test_repo', 'branch_name': 'main'},
-    'git_show': {'repo_path': '/tmp/test_repo', 'revision': 'HEAD'},
-    'git_branch': {'repo_path': '/tmp/test_repo', 'branch_type': 'all'},
+    # Real test files from TEST_DATA_PATH
+    test_text = str(TEST_DATA_PATH / 'files/test_medium.txt')
+    test_json = str(TEST_DATA_PATH / 'files/test_medium.json')
+    test_log = str(TEST_DATA_PATH / 'files/test_medium.log')
+    test_image = str(TEST_DATA_PATH / 'images/size_test/test_4mp.png')
+    test_large_image = str(TEST_DATA_PATH / 'images/size_test/test_9mp.png')
+    test_git_repo = str(TEST_DATA_PATH / 'git_repo')
+    test_files_dir = str(TEST_DATA_PATH / 'files')
+    test_images_dir = str(TEST_DATA_PATH / 'images/size_test')
 
-    # Fetch (1)
-    'fetch': {'url': 'https://example.com'},
+    # Read actual log content for log parser tests
+    try:
+        with open(test_log, 'r') as f:
+            log_content = f.read()
+    except:
+        log_content = 'ERROR test\n' * 100
 
-    # Sequential Thinking (1)
-    'sequentialthinking': {
-        'thought': 'test thought',
-        'nextThoughtNeeded': False,
-        'thoughtNumber': 1,
-        'totalThoughts': 1
-    },
+    return {
+        # Filesystem (14)
+        'read_file': {'path': test_text},
+        'read_text_file': {'path': test_text},
+        'read_media_file': {'path': test_image},
+        'read_multiple_files': {'paths': [test_text, test_json]},
+        'write_file': {'path': '/tmp/test_write.txt', 'content': 'test' * 1000},
+        'edit_file': {'path': test_text, 'edits': [{'oldText': 'the', 'newText': 'THE'}], 'dryRun': True},
+        'create_directory': {'path': '/tmp/test_dir_new'},
+        'list_directory': {'path': test_files_dir},
+        'list_directory_with_sizes': {'path': test_files_dir},
+        'directory_tree': {'path': test_files_dir},
+        'move_file': {'source': '/tmp/test_move_src.txt', 'destination': '/tmp/test_move_dst.txt'},
+        'search_files': {'path': test_files_dir, 'pattern': '*.txt'},
+        'get_file_info': {'path': test_text},
+        'list_allowed_directories': {},
 
-    # Time (2)
-    'get_current_time': {'timezone': 'Asia/Seoul'},
-    'convert_time': {'source_timezone': 'Asia/Seoul', 'time': '12:00', 'target_timezone': 'America/New_York'},
+        # Git (12)
+        'git_status': {'repo_path': test_git_repo},
+        'git_diff_unstaged': {'repo_path': test_git_repo},
+        'git_diff_staged': {'repo_path': test_git_repo},
+        'git_diff': {'repo_path': test_git_repo, 'target': 'HEAD~1'},
+        'git_commit': {'repo_path': test_git_repo, 'message': 'test commit'},
+        'git_add': {'repo_path': test_git_repo, 'files': ['test.txt']},
+        'git_reset': {'repo_path': test_git_repo},
+        'git_log': {'repo_path': test_git_repo, 'max_count': 10},
+        'git_create_branch': {'repo_path': test_git_repo, 'branch_name': 'test-branch'},
+        'git_checkout': {'repo_path': test_git_repo, 'branch_name': 'main'},
+        'git_show': {'repo_path': test_git_repo, 'revision': 'HEAD'},
+        'git_branch': {'repo_path': test_git_repo, 'branch_type': 'all'},
 
-    # Summarize (3)
-    'summarize_text': {'text': 'test ' * 100, 'max_length': 50},
-    'summarize_documents': {'documents': [{'title': 'doc1', 'content': 'test ' * 50}]},
-    'get_provider_info': {},
+        # Fetch (1)
+        'fetch': {'url': 'https://example.com'},
 
-    # Log Parser (5)
-    'parse_logs': {'log_content': 'ERROR test\n' * 100, 'format_type': 'auto'},
-    'filter_entries': {'entries': [{'level': 'ERROR', 'message': 'test'}], 'min_level': 'WARNING'},
-    'compute_log_statistics': {'entries': [{'level': 'ERROR', 'message': 'test'} for _ in range(10)]},
-    'search_entries': {'entries': [{'message': 'test error'}], 'pattern': 'error'},
-    'extract_time_range': {'entries': [{'timestamp': '2024-01-01T00:00:00Z', 'message': 'test'}]},
+        # Sequential Thinking (1)
+        'sequentialthinking': {
+            'thought': 'Analyzing the problem of edge computing resource allocation',
+            'nextThoughtNeeded': False,
+            'thoughtNumber': 1,
+            'totalThoughts': 1
+        },
 
-    # Data Aggregate (5)
-    'aggregate_list': {'items': [{'type': 'A', 'value': i} for i in range(100)]},
-    'merge_summaries': {'summaries': [{'key': 'test', 'value': 1}, {'key': 'test', 'value': 2}]},
-    'combine_research_results': {'results': [{'source': 'A', 'data': 'test1'}, {'source': 'B', 'data': 'test2'}]},
-    'deduplicate': {'items': [{'id': 1, 'name': 'test'}, {'id': 1, 'name': 'test'}], 'key_fields': ['id']},
-    'compute_trends': {'time_series': [{'timestamp': '2024-01-01', 'value': 10}, {'timestamp': '2024-01-02', 'value': 20}]},
+        # Time (2)
+        'get_current_time': {'timezone': 'Asia/Seoul'},
+        'convert_time': {'source_timezone': 'Asia/Seoul', 'time': '12:00', 'target_timezone': 'America/New_York'},
 
-    # Image Resize (6)
-    'get_image_info': {'image_path': '/tmp/test.jpg'},
-    'resize_image': {'image_path': '/tmp/test.jpg'},
-    'scan_directory': {'directory': '/tmp'},
-    'compute_image_hash': {'image_path': '/tmp/test.jpg'},
-    'compare_hashes': {'hashes': ['abc123', 'abc124']},
-    'batch_resize': {'image_paths': ['/tmp/test.jpg']},
-}
+        # Summarize (3)
+        'summarize_text': {'text': 'Lorem ipsum ' * 500, 'max_length': 100},
+        'summarize_documents': {'documents': [
+            {'title': 'doc1', 'content': 'Lorem ipsum ' * 200},
+            {'title': 'doc2', 'content': 'Dolor sit amet ' * 200}
+        ]},
+        'get_provider_info': {},
+
+        # Log Parser (5)
+        'parse_logs': {'log_content': log_content, 'format_type': 'auto'},
+        'filter_entries': {
+            'entries': [
+                {'level': 'ERROR', 'message': 'Error occurred'},
+                {'level': 'WARNING', 'message': 'Warning message'},
+                {'level': 'INFO', 'message': 'Info message'}
+            ],
+            'min_level': 'WARNING'
+        },
+        'compute_log_statistics': {
+            'entries': [{'level': 'ERROR', 'message': f'test {i}'} for i in range(100)]
+        },
+        'search_entries': {
+            'entries': [
+                {'message': 'test error occurred'},
+                {'message': 'test warning'},
+                {'message': 'normal message'}
+            ],
+            'pattern': 'error'
+        },
+        'extract_time_range': {
+            'entries': [
+                {'timestamp': '2024-01-01T00:00:00Z', 'message': 'test1'},
+                {'timestamp': '2024-01-01T12:00:00Z', 'message': 'test2'},
+                {'timestamp': '2024-01-02T00:00:00Z', 'message': 'test3'}
+            ]
+        },
+
+        # Data Aggregate (5)
+        'aggregate_list': {'items': [{'type': chr(65 + i % 5), 'value': i} for i in range(1000)]},
+        'merge_summaries': {
+            'summaries': [
+                {'category': 'A', 'count': 10, 'total': 100},
+                {'category': 'B', 'count': 20, 'total': 200},
+                {'category': 'A', 'count': 5, 'total': 50}
+            ]
+        },
+        'combine_research_results': {
+            'results': [
+                {'source': 'Database A', 'data': 'Result set 1 with ' + 'data ' * 50},
+                {'source': 'Database B', 'data': 'Result set 2 with ' + 'data ' * 50},
+                {'source': 'API C', 'data': 'Result set 3 with ' + 'data ' * 50}
+            ]
+        },
+        'deduplicate': {
+            'items': [
+                {'id': 1, 'name': 'item1'},
+                {'id': 2, 'name': 'item2'},
+                {'id': 1, 'name': 'item1'},
+                {'id': 3, 'name': 'item3'},
+                {'id': 2, 'name': 'item2'}
+            ],
+            'key_fields': ['id']
+        },
+        'compute_trends': {
+            'time_series': [
+                {'timestamp': f'2024-01-{i:02d}', 'value': 10 + i * 2}
+                for i in range(1, 31)
+            ]
+        },
+
+        # Image Resize (6)
+        'get_image_info': {'image_path': test_image},
+        'resize_image': {'image_path': test_image, 'max_width': 800, 'max_height': 600},
+        'scan_directory': {'directory': test_images_dir},
+        'compute_image_hash': {'image_path': test_image},
+        'compare_hashes': {
+            'hashes': [
+                'abc123def456',
+                'abc124def456',
+                '123456789abc'
+            ]
+        },
+        'batch_resize': {
+            'image_paths': [test_image, test_large_image],
+            'max_width': 800,
+            'max_height': 600
+        },
+    }
 
 
 def get_payload_size(payload):
@@ -258,6 +353,15 @@ def main():
     print("WASM servers location:")
     print(f"  {WASM_PATH}")
     print()
+    print("Test data location:")
+    print(f"  {TEST_DATA_PATH}")
+    if not TEST_DATA_PATH.exists():
+        print(f"  ⚠️  Test data path does not exist!")
+        print(f"  Please copy test_data to the correct location")
+    print()
+
+    # Generate test payloads with real data
+    TEST_PAYLOADS = get_test_payloads()
 
     all_tools = get_all_tools()
     results = []
