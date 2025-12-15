@@ -296,7 +296,9 @@ def measure_tool_wasm(tool_name, server_name, payload, runs=3):
                     output_size = len(proc.stdout)
                     exec_times.append(end - start)
             else:
-                print(f"    ⚠️  wasmtime failed: {proc.stderr[:100]}")
+                print(f"    ⚠️  wasmtime failed (returncode={proc.returncode})")
+                print(f"    STDERR: {proc.stderr}")
+                print(f"    STDOUT: {proc.stdout[:200]}")
                 # 실패한 경우 측정하지 않음
 
         except subprocess.TimeoutExpired:
