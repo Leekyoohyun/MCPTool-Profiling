@@ -187,21 +187,23 @@ def measure_tool_wasm(tool_name, server_name, payload, runs=3):
             )
 
             end = time.time()
-            exec_times.append(end - start)
 
             if proc.returncode == 0:
                 # Parse response
                 try:
                     response = json.loads(proc.stdout)
                     output_size = sys.getsizeof(json.dumps(response))
+                    exec_times.append(end - start)
                 except json.JSONDecodeError:
                     output_size = len(proc.stdout)
+                    exec_times.append(end - start)
             else:
                 print(f"    ⚠️  wasmtime failed: {proc.stderr[:100]}")
+                # 실패한 경우 측정하지 않음
 
         except subprocess.TimeoutExpired:
             print(f"    ⚠️  Timeout")
-            exec_times.append(10.0)
+            # Timeout은 측정 불가
         except Exception as e:
             print(f"    ⚠️  Error: {e}")
             return None
