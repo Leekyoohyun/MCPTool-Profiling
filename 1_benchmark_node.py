@@ -19,6 +19,7 @@ import platform
 import os
 import json
 import time
+import sys
 from pathlib import Path
 
 
@@ -147,9 +148,23 @@ def main():
     print(f"Machine: {platform.machine()}")
     print()
 
-    # Get target server from environment
-    target_server = os.getenv('IPERF_SERVER', '10.2.0.1')
-    latency_port = int(os.getenv('LATENCY_PORT', '80'))
+    # Get target server from command-line args or environment
+    if len(sys.argv) >= 2:
+        target_server = sys.argv[1]
+    else:
+        target_server = os.getenv('IPERF_SERVER', '10.2.0.1')
+
+    if len(sys.argv) >= 3:
+        latency_port = int(sys.argv[2])
+    else:
+        latency_port = int(os.getenv('LATENCY_PORT', '80'))
+
+    print(f"Target server: {target_server}")
+    print(f"Latency port: {latency_port}")
+    print()
+
+    # Set environment variable for iperf3
+    os.environ['IPERF_SERVER'] = target_server
 
     # Measure network bandwidth
     network_bw = benchmark_network()
