@@ -86,7 +86,7 @@ TEST_PAYLOADS = {
     'git_create_branch': {'repo_path': '/tmp/test_repo', 'branch_name': 'test-branch'},
     'git_checkout': {'repo_path': '/tmp/test_repo', 'branch_name': 'main'},
     'git_show': {'repo_path': '/tmp/test_repo', 'revision': 'HEAD'},
-    'git_branch': {'repo_path': '/tmp/test_repo'},
+    'git_branch': {'repo_path': '/tmp/test_repo', 'branch_type': 'all'},
 
     # Fetch (1)
     'fetch': {'url': 'https://example.com'},
@@ -120,15 +120,15 @@ TEST_PAYLOADS = {
     'merge_summaries': {'summaries': [{'key': 'test', 'value': 1}, {'key': 'test', 'value': 2}]},
     'combine_research_results': {'results': [{'source': 'A', 'data': 'test1'}, {'source': 'B', 'data': 'test2'}]},
     'deduplicate': {'items': [{'id': 1, 'name': 'test'}, {'id': 1, 'name': 'test'}], 'key_fields': ['id']},
-    'compute_trends': {'data': [{'timestamp': '2024-01-01', 'value': 10}, {'timestamp': '2024-01-02', 'value': 20}]},
+    'compute_trends': {'time_series': [{'timestamp': '2024-01-01', 'value': 10}, {'timestamp': '2024-01-02', 'value': 20}]},
 
     # Image Resize (6)
     'get_image_info': {'image_path': '/tmp/test.jpg'},
-    'resize_image': {'image_path': '/tmp/test.jpg', 'max_width': 800, 'max_height': 600},
-    'scan_directory': {'directory_path': '/tmp'},
+    'resize_image': {'image_path': '/tmp/test.jpg'},
+    'scan_directory': {'directory': '/tmp'},
     'compute_image_hash': {'image_path': '/tmp/test.jpg'},
-    'compare_hashes': {'hash1': 'abc123', 'hash2': 'abc124'},
-    'batch_resize': {'image_paths': ['/tmp/test.jpg'], 'max_width': 800, 'max_height': 600},
+    'compare_hashes': {'hashes': ['abc123', 'abc124']},
+    'batch_resize': {'image_paths': ['/tmp/test.jpg']},
 }
 
 
