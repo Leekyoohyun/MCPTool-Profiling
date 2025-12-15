@@ -43,20 +43,21 @@ for path in WASM_PATH_CANDIDATES:
 if WASM_PATH is None:
     WASM_PATH = WASM_PATH_CANDIDATES[0]  # Default to first
 
-# Test data path
-TEST_DATA_CANDIDATES = [
-    Path.home() / "EdgeAgent-Profiling-for-coremark-v1/test_data",  # Nodes
-    Path.home() / "DDPS/undergraduated/CCGrid-2026/EdgeAgent/EdgeAgent-Profiling-for-coremark-v1/test_data",  # MacBook
-]
+# Test data path - use local test_data directory
+TEST_DATA_PATH = Path(__file__).parent / "test_data"
 
-TEST_DATA_PATH = None
-for path in TEST_DATA_CANDIDATES:
-    if path.exists():
-        TEST_DATA_PATH = path
-        break
+# Fallback to other locations if local doesn't exist
+if not TEST_DATA_PATH.exists():
+    TEST_DATA_CANDIDATES = [
+        Path.home() / "EdgeAgent-Profile-for-Schedule-v2/test_data",  # Home directory
+        Path.home() / "EdgeAgent-Profiling-for-coremark-v1/test_data",  # Old location
+        Path.home() / "DDPS/undergraduated/CCGrid-2026/EdgeAgent/EdgeAgent-Profiling-for-coremark-v1/test_data",  # MacBook
+    ]
 
-if TEST_DATA_PATH is None:
-    TEST_DATA_PATH = TEST_DATA_CANDIDATES[0]  # Default to first
+    for path in TEST_DATA_CANDIDATES:
+        if path.exists():
+            TEST_DATA_PATH = path
+            break
 
 # Server name mapping
 SERVER_WASM_MAP = {
