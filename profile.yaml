@@ -1,0 +1,306 @@
+tools:
+  read_file:
+    description: 'Read the complete contents of a file as text. DEPRECATED: Use read_text_file
+      instead.'
+    data_locality: local_data
+    operational_intensity: 0.2336
+    alpha: 0.003
+    P_comp: [0.5, 0.5, 0.0]
+  read_text_file:
+    description: Read the complete contents of a file from the file system as text.
+    data_locality: local_data
+    operational_intensity: 0.276
+    alpha: 0.004
+    P_comp: [0.5, 0.5, 0.0]
+  read_media_file:
+    description: Read an image or audio file. Returns the base64 encoded data and
+      MIME type.
+    data_locality: local_data
+    operational_intensity: 0.2391
+    alpha: 0.003
+    P_comp: [0.5, 0.5, 0.0]
+  read_multiple_files:
+    description: Read the contents of multiple files simultaneously.
+    data_locality: local_data
+    operational_intensity: 0.371
+    alpha: 0.007
+    P_comp: [0.5, 0.5, 0.0]
+  write_file:
+    description: Create a new file or completely overwrite an existing file with new
+      content.
+    data_locality: local_data
+    operational_intensity: 0.3174
+    alpha: 0.005
+    P_comp: [0.5, 0.5, 0.0]
+  edit_file:
+    description: Make line-based edits to a text file.
+    data_locality: local_data
+    operational_intensity: 0.2609
+    alpha: 0.004
+    P_comp: [0.5, 0.5, 0.0]
+  create_directory:
+    description: Create a new directory or ensure a directory exists.
+    data_locality: local_data
+    operational_intensity: 0.1479
+    alpha: 0.001
+    P_comp: [0.5, 0.5, 0.0]
+  list_directory:
+    description: Get a detailed listing of all files and directories in a specified
+      path.
+    data_locality: local_data
+    operational_intensity: 0.2711
+    alpha: 0.004
+    P_comp: [0.5, 0.5, 0.0]
+  list_directory_with_sizes:
+    description: Get a detailed listing of all files and directories with sizes.
+    data_locality: local_data
+    operational_intensity: 0.2092
+    alpha: 0.002
+    P_comp: [0.5, 0.5, 0.0]
+  directory_tree:
+    description: Get a recursive tree view of files and directories as a JSON structure.
+    data_locality: local_data
+    operational_intensity: 0.2339
+    alpha: 0.003
+    P_comp: [0.5, 0.5, 0.0]
+  move_file:
+    description: Move or rename files and directories.
+    data_locality: local_data
+    operational_intensity: 0.3105
+    alpha: 0.005
+    P_comp: [0.5, 0.5, 0.0]
+  search_files:
+    description: Recursively search for files and directories matching a pattern.
+    data_locality: local_data
+    operational_intensity: 0.3269
+    alpha: 0.006
+    P_comp: [0.5, 0.5, 0.0]
+  get_file_info:
+    description: Retrieve detailed metadata about a file or directory.
+    data_locality: local_data
+    operational_intensity: 0.2496
+    alpha: 0.003
+    P_comp: [0.5, 0.5, 0.0]
+  list_allowed_directories:
+    description: Returns the list of directories that this server is allowed to access.
+    data_locality: local_data
+    operational_intensity: 0.4518
+    alpha: 0.011
+    P_comp: [0.5, 0.5, 0.0]
+  git_status:
+    description: Shows the working tree status
+    data_locality: version_control
+    operational_intensity: 0.3266
+    alpha: 0.006
+    P_comp: [0.5, 0.5, 0.0]
+  git_diff_unstaged:
+    description: Shows changes in the working directory that are not yet staged
+    data_locality: version_control
+    operational_intensity: 0.3111
+    alpha: 0.005
+    P_comp: [0.5, 0.5, 0.0]
+  git_diff_staged:
+    description: Shows changes that are staged for commit
+    data_locality: version_control
+    operational_intensity: 0.216
+    alpha: 0.003
+    P_comp: [0.5, 0.5, 0.0]
+  git_diff:
+    description: Shows differences between branches or commits
+    data_locality: version_control
+    operational_intensity: 0.3704
+    alpha: 0.007
+    P_comp: [0.5, 0.5, 0.0]
+  git_commit:
+    description: Records changes to the repository
+    data_locality: version_control
+    operational_intensity: 0.2673
+    alpha: 0.004
+    P_comp: [0.5, 0.5, 0.0]
+  git_add:
+    description: Adds file contents to the staging area
+    data_locality: version_control
+    operational_intensity: 0.2623
+    alpha: 0.004
+    P_comp: [0.5, 0.5, 0.0]
+  git_reset:
+    description: Unstages all staged changes
+    data_locality: version_control
+    operational_intensity: 0.1708
+    alpha: 0.002
+    P_comp: [0.5, 0.5, 0.0]
+  git_log:
+    description: Shows the commit logs
+    data_locality: version_control
+    operational_intensity: 0.3332
+    alpha: 0.006
+    P_comp: [0.5, 0.5, 0.0]
+  git_create_branch:
+    description: Creates a new branch from an optional base branch
+    data_locality: version_control
+    operational_intensity: 0.2111
+    alpha: 0.002
+    P_comp: [0.5, 0.5, 0.0]
+  git_checkout:
+    description: Switches branches
+    data_locality: version_control
+    operational_intensity: 0.2727
+    alpha: 0.004
+    P_comp: [0.5, 0.5, 0.0]
+  git_show:
+    description: Shows the contents of a commit
+    data_locality: version_control
+    operational_intensity: 0.3186
+    alpha: 0.005
+    P_comp: [0.5, 0.5, 0.0]
+  git_branch:
+    description: List Git branches
+    data_locality: version_control
+    operational_intensity: 0.2245
+    alpha: 0.003
+    P_comp: [0.5, 0.5, 0.0]
+  fetch:
+    description: Fetches a URL from the internet and optionally extracts its contents
+      as markdown.
+    data_locality: network
+    operational_intensity: 0.0311
+    alpha: 0.0
+    P_comp: [0.5, 0.5, 0.0]
+  sequentialthinking:
+    description: A detailed tool for dynamic and reflective problem-solving through
+      thoughts.
+    data_locality: local_compute
+    operational_intensity: 8.5262
+    alpha: 0.798
+    P_comp: [0.5, 0.5, 0.0]
+  get_current_time:
+    description: Get current time in a specific timezones
+    data_locality: local_utility
+    operational_intensity: 9.2972
+    alpha: 0.825
+    P_comp: [0.5, 0.5, 0.0]
+  convert_time:
+    description: Convert time between timezones
+    data_locality: local_utility
+    operational_intensity: 8.2125
+    alpha: 0.786
+    P_comp: [0.5, 0.5, 0.0]
+  summarize_text:
+    description: Summarize the given text.
+    data_locality: network
+    operational_intensity: 0.0507
+    alpha: 0.0
+    P_comp: [0.5, 0.5, 0.0]
+  summarize_documents:
+    description: Summarize multiple documents.
+    data_locality: network
+    operational_intensity: 0.0645
+    alpha: 0.0
+    P_comp: [0.5, 0.5, 0.0]
+  get_provider_info:
+    description: Get information about the current summarization provider.
+    data_locality: network
+    operational_intensity: 1.2367
+    alpha: 0.077
+    P_comp: [0.5, 0.5, 0.0]
+  parse_logs:
+    description: Parse raw log content into structured entries.
+    data_locality: local_data
+    operational_intensity: 10.2773
+    alpha: 0.852
+    P_comp: [0.5, 0.5, 0.0]
+  filter_entries:
+    description: Filter log entries by severity level.
+    data_locality: local_data
+    operational_intensity: 1.0551
+    alpha: 0.057
+    P_comp: [0.5, 0.5, 0.0]
+  compute_log_statistics:
+    description: Compute statistics from parsed log entries.
+    data_locality: local_data
+    operational_intensity: 12.2836
+    alpha: 0.892
+    P_comp: [0.5, 0.5, 0.0]
+  search_entries:
+    description: Search log entries by regex pattern.
+    data_locality: local_data
+    operational_intensity: 1.4424
+    alpha: 0.102
+    P_comp: [0.5, 0.5, 0.0]
+  extract_time_range:
+    description: Extract time range information from log entries.
+    data_locality: local_data
+    operational_intensity: 1.5371
+    alpha: 0.114
+    P_comp: [0.5, 0.5, 0.0]
+  aggregate_list:
+    description: Aggregate a list of dictionaries by grouping, counting, or summing.
+    data_locality: local_compute
+    operational_intensity: 1.132
+    alpha: 0.065
+    P_comp: [0.5, 0.5, 0.0]
+  merge_summaries:
+    description: Merge multiple summary dictionaries into one.
+    data_locality: local_compute
+    operational_intensity: 1.0396
+    alpha: 0.056
+    P_comp: [0.5, 0.5, 0.0]
+  combine_research_results:
+    description: Combine multiple research/search results into a coherent summary.
+    data_locality: local_compute
+    operational_intensity: 1.2789
+    alpha: 0.082
+    P_comp: [0.5, 0.5, 0.0]
+  deduplicate:
+    description: Remove duplicate items based on key fields.
+    data_locality: local_compute
+    operational_intensity: 1.1921
+    alpha: 0.072
+    P_comp: [0.5, 0.5, 0.0]
+  compute_trends:
+    description: Compute trends from time-series data.
+    data_locality: local_compute
+    operational_intensity: 6.7043
+    alpha: 0.71
+    P_comp: [0.5, 0.5, 0.0]
+  get_image_info:
+    description: Get detailed information about an image.
+    data_locality: local_data
+    operational_intensity: 0.3865
+    alpha: 0.008
+    P_comp: [0.5, 0.5, 0.0]
+  resize_image:
+    description: Resize an image and return as base64.
+    data_locality: local_data
+    operational_intensity: 7.8893
+    alpha: 0.772
+    P_comp: [0.5, 0.5, 0.0]
+  scan_directory:
+    description: Scan a directory for image files.
+    data_locality: local_data
+    operational_intensity: 0.4136
+    alpha: 0.009
+    P_comp: [0.5, 0.5, 0.0]
+  compute_image_hash:
+    description: Compute perceptual hash of an image for duplicate detection.
+    data_locality: local_data
+    operational_intensity: 8.4163
+    alpha: 0.794
+    P_comp: [0.5, 0.5, 0.0]
+  compare_hashes:
+    description: Compare image hashes to find duplicates/similar images.
+    data_locality: local_data
+    operational_intensity: 12.2595
+    alpha: 0.891
+    P_comp: [0.5, 0.5, 0.0]
+  batch_resize:
+    description: Resize multiple images at once (e.g., create thumbnails).
+    data_locality: local_data
+    operational_intensity: 10.5619
+    alpha: 0.859
+    P_comp: [0.5, 0.5, 0.0]
+node_specs:
+  DEVICE:
+    peak_flops: 289.42
+    memory_bw: 67.54
+    ridge_point: 4.285164347053597

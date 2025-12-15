@@ -1,0 +1,590 @@
+[
+  {
+    "tool_name": "read_file",
+    "server": "filesystem",
+    "description": "Read the complete contents of a file as text. DEPRECATED: Use read_text_file instead.",
+    "operational_intensity": 0.2336,
+    "measurements": [
+      0.3232989901230031,
+      0.15733738169502542,
+      0.2202597562869079
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "read_text_file",
+    "server": "filesystem",
+    "description": "Read the complete contents of a file from the file system as text.",
+    "operational_intensity": 0.276,
+    "measurements": [
+      0.19938718885521467,
+      0.4990622359295147,
+      0.12969800325783046
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "read_media_file",
+    "server": "filesystem",
+    "description": "Read an image or audio file. Returns the base64 encoded data and MIME type.",
+    "operational_intensity": 0.2391,
+    "measurements": [
+      0.18526900331636367,
+      0.13693951494041,
+      0.39505787321592634
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "read_multiple_files",
+    "server": "filesystem",
+    "description": "Read the contents of multiple files simultaneously.",
+    "operational_intensity": 0.371,
+    "measurements": [
+      0.49065378884708266,
+      0.3785823741141112,
+      0.24376501013947657
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "write_file",
+    "server": "filesystem",
+    "description": "Create a new file or completely overwrite an existing file with new content.",
+    "operational_intensity": 0.3174,
+    "measurements": [
+      0.273504360344018,
+      0.22611782970087435,
+      0.45255741061294785
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "edit_file",
+    "server": "filesystem",
+    "description": "Make line-based edits to a text file.",
+    "operational_intensity": 0.2609,
+    "measurements": [
+      0.11995000473502207,
+      0.31667412537319584,
+      0.3460495376292979
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "create_directory",
+    "server": "filesystem",
+    "description": "Create a new directory or ensure a directory exists.",
+    "operational_intensity": 0.1479,
+    "measurements": [
+      0.11505539321013308,
+      0.13642435313936027,
+      0.19229198002693115
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "list_directory",
+    "server": "filesystem",
+    "description": "Get a detailed listing of all files and directories in a specified path.",
+    "operational_intensity": 0.2711,
+    "measurements": [
+      0.3316612337289758,
+      0.36974100165169854,
+      0.11175978958932845
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "list_directory_with_sizes",
+    "server": "filesystem",
+    "description": "Get a detailed listing of all files and directories with sizes.",
+    "operational_intensity": 0.2092,
+    "measurements": [
+      0.2539639406316452,
+      0.16874027509187828,
+      0.2050059420065479
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "directory_tree",
+    "server": "filesystem",
+    "description": "Get a recursive tree view of files and directories as a JSON structure.",
+    "operational_intensity": 0.2339,
+    "measurements": [
+      0.13686451947773023,
+      0.2164831327259783,
+      0.3483553915721145
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "move_file",
+    "server": "filesystem",
+    "description": "Move or rename files and directories.",
+    "operational_intensity": 0.3105,
+    "measurements": [
+      0.3644556078943123,
+      0.1493544907485528,
+      0.41777961828837795
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "search_files",
+    "server": "filesystem",
+    "description": "Recursively search for files and directories matching a pattern.",
+    "operational_intensity": 0.3269,
+    "measurements": [
+      0.47227026677535233,
+      0.1628269144896003,
+      0.3457076396665902
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "get_file_info",
+    "server": "filesystem",
+    "description": "Retrieve detailed metadata about a file or directory.",
+    "operational_intensity": 0.2496,
+    "measurements": [
+      0.4499161055101041,
+      0.10115785878157708,
+      0.19776645322708558
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "list_allowed_directories",
+    "server": "filesystem",
+    "description": "Returns the list of directories that this server is allowed to access.",
+    "operational_intensity": 0.4518,
+    "measurements": [
+      0.4478738167331252,
+      0.4440215095171328,
+      0.4636197686938558
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "git_status",
+    "server": "git",
+    "description": "Shows the working tree status",
+    "operational_intensity": 0.3266,
+    "measurements": [
+      0.4122240172703009,
+      0.30099272509871633,
+      0.2664539024552666
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "git_diff_unstaged",
+    "server": "git",
+    "description": "Shows changes in the working directory that are not yet staged",
+    "operational_intensity": 0.3111,
+    "measurements": [
+      0.2995,
+      0.3205,
+      0.3309
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "git_diff_staged",
+    "server": "git",
+    "description": "Shows changes that are staged for commit",
+    "operational_intensity": 0.216,
+    "measurements": [
+      0.1935,
+      0.2469,
+      0.1908
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "git_diff",
+    "server": "git",
+    "description": "Shows differences between branches or commits",
+    "operational_intensity": 0.3704,
+    "measurements": [
+      0.422669968442528,
+      0.3784403487586441,
+      0.3102309755883142
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "git_commit",
+    "server": "git",
+    "description": "Records changes to the repository",
+    "operational_intensity": 0.2673,
+    "measurements": [
+      0.32033271774956895,
+      0.31121290675377966,
+      0.17044175465306283
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "git_add",
+    "server": "git",
+    "description": "Adds file contents to the staging area",
+    "operational_intensity": 0.2623,
+    "measurements": [
+      0.16856583522590946,
+      0.33646619519098425,
+      0.2818057086160853
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "git_reset",
+    "server": "git",
+    "description": "Unstages all staged changes",
+    "operational_intensity": 0.1708,
+    "measurements": [
+      0.10232685571632377,
+      0.12630277400549753,
+      0.28373658041102345
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "git_log",
+    "server": "git",
+    "description": "Shows the commit logs",
+    "operational_intensity": 0.3332,
+    "measurements": [
+      0.49764837280819263,
+      0.31266056991554236,
+      0.18926992909019577
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "git_create_branch",
+    "server": "git",
+    "description": "Creates a new branch from an optional base branch",
+    "operational_intensity": 0.2111,
+    "measurements": [
+      0.10234798285204612,
+      0.37755473431902553,
+      0.1535090519750898
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "git_checkout",
+    "server": "git",
+    "description": "Switches branches",
+    "operational_intensity": 0.2727,
+    "measurements": [
+      0.2823,
+      0.2928,
+      0.3245
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "git_show",
+    "server": "git",
+    "description": "Shows the contents of a commit",
+    "operational_intensity": 0.3186,
+    "measurements": [
+      0.40402653046970116,
+      0.2655124330642963,
+      0.2862327425631337
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "git_branch",
+    "server": "git",
+    "description": "List Git branches",
+    "operational_intensity": 0.2245,
+    "measurements": [
+      0.2405,
+      0.2546,
+      0.2667
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "fetch",
+    "server": "fetch",
+    "description": "Fetches a URL from the internet and optionally extracts its contents as markdown.",
+    "operational_intensity": 0.0311,
+    "measurements": [
+      0.02948340940854146,
+      0.04596198995372472,
+      0.01787179368449777
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "sequentialthinking",
+    "server": "sequentialthinking",
+    "description": "A detailed tool for dynamic and reflective problem-solving through thoughts.",
+    "operational_intensity": 8.5262,
+    "measurements": [
+      10.1881,
+      8.5753,
+      9.6791
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "get_current_time",
+    "server": "time",
+    "description": "Get current time in a specific timezones",
+    "operational_intensity": 9.2972,
+    "measurements": [
+      9.734902933366664,
+      5.5033375855077304,
+      12.6532367991698
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "convert_time",
+    "server": "time",
+    "description": "Convert time between timezones",
+    "operational_intensity": 8.2125,
+    "measurements": [
+      7.012,
+      9.5341,
+      6.9088
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "summarize_text",
+    "server": "summarize",
+    "description": "Summarize the given text.",
+    "operational_intensity": 0.0507,
+    "measurements": [
+      0.04850423759898649,
+      0.04307469451292862,
+      0.06037739722148681
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "summarize_documents",
+    "server": "summarize",
+    "description": "Summarize multiple documents.",
+    "operational_intensity": 0.0645,
+    "measurements": [
+      0.088181251163952,
+      0.09507210848968449,
+      0.010120547637737384
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "get_provider_info",
+    "server": "summarize",
+    "description": "Get information about the current summarization provider.",
+    "operational_intensity": 1.2367,
+    "measurements": [
+      0.8902841694444028,
+      1.5187710274899737,
+      1.301121222603964
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "parse_logs",
+    "server": "log_parser",
+    "description": "Parse raw log content into structured entries.",
+    "operational_intensity": 10.2773,
+    "measurements": [
+      5.136962546025669,
+      10.798060962719617,
+      14.896797125389424
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "filter_entries",
+    "server": "log_parser",
+    "description": "Filter log entries by severity level.",
+    "operational_intensity": 1.0551,
+    "measurements": [
+      0.8829519353618273,
+      1.6895297476182054,
+      0.5927703397936281
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "compute_log_statistics",
+    "server": "log_parser",
+    "description": "Compute statistics from parsed log entries.",
+    "operational_intensity": 12.2836,
+    "measurements": [
+      13.750257974314268,
+      13.94230204427027,
+      9.158281734524326
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "search_entries",
+    "server": "log_parser",
+    "description": "Search log entries by regex pattern.",
+    "operational_intensity": 1.4424,
+    "measurements": [
+      1.5913763984285088,
+      1.4250724667761603,
+      1.3108629611454787
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "extract_time_range",
+    "server": "log_parser",
+    "description": "Extract time range information from log entries.",
+    "operational_intensity": 1.5371,
+    "measurements": [
+      1.3531921685188455,
+      1.2937551998009282,
+      1.964293562185447
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "aggregate_list",
+    "server": "data_aggregate",
+    "description": "Aggregate a list of dictionaries by grouping, counting, or summing.",
+    "operational_intensity": 1.132,
+    "measurements": [
+      1.7587889393093898,
+      0.7663468976292663,
+      0.8709562377675749
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "merge_summaries",
+    "server": "data_aggregate",
+    "description": "Merge multiple summary dictionaries into one.",
+    "operational_intensity": 1.0396,
+    "measurements": [
+      1.1479071609901377,
+      0.6026992710298302,
+      1.3682887393918892
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "combine_research_results",
+    "server": "data_aggregate",
+    "description": "Combine multiple research/search results into a coherent summary.",
+    "operational_intensity": 1.2789,
+    "measurements": [
+      1.1342204814879777,
+      1.1769004295249772,
+      1.5257206815164472
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "deduplicate",
+    "server": "data_aggregate",
+    "description": "Remove duplicate items based on key fields.",
+    "operational_intensity": 1.1921,
+    "measurements": [
+      0.7478235417793564,
+      1.245353985244948,
+      1.5831768096057814
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "compute_trends",
+    "server": "data_aggregate",
+    "description": "Compute trends from time-series data.",
+    "operational_intensity": 6.7043,
+    "measurements": [
+      6.026625075792877,
+      7.658504562626237,
+      6.427802876849765
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "get_image_info",
+    "server": "image_resize",
+    "description": "Get detailed information about an image.",
+    "operational_intensity": 0.3865,
+    "measurements": [
+      0.3367772271711218,
+      0.4933539455057855,
+      0.329296476710797
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "resize_image",
+    "server": "image_resize",
+    "description": "Resize an image and return as base64.",
+    "operational_intensity": 7.8893,
+    "measurements": [
+      9.169320272526322,
+      5.210321548176435,
+      9.28831397996756
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "scan_directory",
+    "server": "image_resize",
+    "description": "Scan a directory for image files.",
+    "operational_intensity": 0.4136,
+    "measurements": [
+      0.30356694333960166,
+      0.45320787684315034,
+      0.48391658969176443
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "compute_image_hash",
+    "server": "image_resize",
+    "description": "Compute perceptual hash of an image for duplicate detection.",
+    "operational_intensity": 8.4163,
+    "measurements": [
+      5.898272588020425,
+      10.946069261531377,
+      8.404472779912776
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "compare_hashes",
+    "server": "image_resize",
+    "description": "Compare image hashes to find duplicates/similar images.",
+    "operational_intensity": 12.2595,
+    "measurements": [
+      14.02703532087877,
+      7.969917483035661,
+      14.781455566085786
+    ],
+    "runs": 3
+  },
+  {
+    "tool_name": "batch_resize",
+    "server": "image_resize",
+    "description": "Resize multiple images at once (e.g., create thumbnails).",
+    "operational_intensity": 10.5619,
+    "measurements": [
+      11.001169506516302,
+      12.482235459489061,
+      8.202445019162646
+    ],
+    "runs": 3
+  }
+]
