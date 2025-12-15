@@ -272,8 +272,8 @@ def measure_tool_wasm(tool_name, server_name, payload, runs=3):
 
     for run in range(runs):
         try:
-            # Run wasmtime
-            cmd = ['wasmtime', 'run', '--dir=/tmp', str(wasm_file)]
+            # Run wasmtime with HTTP support
+            cmd = ['wasmtime', 'run', '--wasi', 'http', '--dir=/tmp', str(wasm_file)]
             start = time.time()
 
             proc = subprocess.run(
