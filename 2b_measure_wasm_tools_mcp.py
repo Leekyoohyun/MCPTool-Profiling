@@ -184,20 +184,19 @@ def get_test_payloads():
 
         # Image Resize (6)
         'get_image_info': {'image_path': '/tmp/test_4mp.png'},
-        'resize_image': {'image_path': '/tmp/test_4mp.png', 'max_width': 800, 'max_height': 600},
+        'resize_image': {'image_path': '/tmp/test_4mp.png', 'max_size': 800},
         'scan_directory': {'directory': '/tmp'},
         'compute_image_hash': {'image_path': '/tmp/test_4mp.png'},
         'compare_hashes': {
             'hashes': [
-                'abc123def456',
-                'abc124def456',
-                '123456789abc'
+                {'hash': 'abc123def456', 'path': '/tmp/test_4mp.png'},
+                {'hash': 'abc124def456', 'path': '/tmp/test_9mp.png'},
+                {'hash': '123456789abc', 'path': '/tmp/test_16mp.png'}
             ]
         },
         'batch_resize': {
             'image_paths': ['/tmp/test_4mp.png', '/tmp/test_9mp.png'],
-            'max_width': 800,
-            'max_height': 600
+            'max_size': 800
         },
     }
 
