@@ -61,10 +61,9 @@ if ENV_VARS.get('ANTHROPIC_API_KEY'):
 # Can be overridden with EDGEAGENT_PATH environment variable
 EDGEAGENT_PATH_CANDIDATES = [
     Path(os.environ.get('EDGEAGENT_PATH', '')),  # Environment variable (highest priority)
-    Path.home() / "CCGrid-2026/EdgeAgent",  # AWS EC2: /home/ubuntu/CCGrid-2026/EdgeAgent
+    Path.home() / "CCGrid-2026/EdgeAgent/EdgeAgent",  # AWS EC2: /home/ubuntu/CCGrid-2026/EdgeAgent/EdgeAgent
     Path.home() / "EdgeAgent",  # Cloud: ~/EdgeAgent
     Path.home() / "DDPS/undergraduated/CCGrid-2026/EdgeAgent/EdgeAgent",  # MacBook
-    Path("/home/ubuntu/CCGrid-2026/EdgeAgent"),  # AWS EC2 absolute
 ]
 
 EDGEAGENT_PATH = None
