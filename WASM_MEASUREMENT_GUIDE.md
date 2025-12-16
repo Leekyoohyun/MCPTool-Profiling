@@ -79,10 +79,8 @@ Output: `wasm_tool_exec_time_<hostname>.json`
 - **Data Aggregate**: All 5 tools
 - **Image Resize**: get_image_info, compute_image_hash, compare_hashes, resize_image (if images exist)
 - **Sequential Thinking**: sequentialthinking
-
-### Tools that will be skipped:
-- **fetch**: Requires HTTP (not available in stdio transport)
-- **summarize**: Requires HTTP (not available in stdio transport)
+- **Fetch**: fetch (with --wasi http support)
+- **Summarize**: summarize_text, summarize_documents, get_provider_info (with --wasi http support)
 
 ### Tools that might fail:
 - **read_media_file**: May have encoding issues in WASM
