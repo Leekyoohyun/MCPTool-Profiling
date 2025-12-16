@@ -180,7 +180,7 @@ async def measure_server_tools(server_name, tool_names, test_payloads, runs=3):
                         'runs': len(exec_times),
                         'measurements': exec_times
                     })
-                    print(f"✓ {avg_exec_time:.3f}s")
+                    print(f"✓ {avg_exec_time*1000:.1f}ms")
                 else:
                     print(f"❌ All runs failed")
 

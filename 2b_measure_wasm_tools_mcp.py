@@ -183,7 +183,7 @@ async def measure_server_tools(server_name, tools_to_measure, test_payloads, run
                         'runs': len(exec_times),
                         'measurements': exec_times
                     })
-                    print(f"    ✓ {avg_exec_time:.3f}s (avg of {len(exec_times)} runs)")
+                    print(f"    ✓ {avg_exec_time*1000:.1f}ms (avg of {len(exec_times)} runs)")
                 else:
                     print(f"    ❌ All runs failed")
 
