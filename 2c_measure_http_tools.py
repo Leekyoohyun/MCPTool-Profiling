@@ -93,6 +93,10 @@ def start_wasmtime_server(wasm_file, port=8000):
     """
     import os
 
+    # Get API keys first (need them for command line)
+    openai_key = ENV_VARS.get('OPENAI_API_KEY', '') or os.environ.get('OPENAI_API_KEY', '')
+    anthropic_key = ENV_VARS.get('ANTHROPIC_API_KEY', '') or os.environ.get('ANTHROPIC_API_KEY', '')
+
     # Build command
     cmd = ['wasmtime', 'serve']
 
@@ -105,27 +109,24 @@ def start_wasmtime_server(wasm_file, port=8000):
         '--dir=/tmp',
     ])
 
-    cmd.append(str(wasm_file))
-
-    print(f"  Starting wasmtime serve on port {port}...")
-    print(f"  Command: {' '.join(cmd)}")
-
-    # Prepare environment with API keys
-    env = os.environ.copy()
-
-    # Try .env file first, then system environment
-    openai_key = ENV_VARS.get('OPENAI_API_KEY', '') or os.environ.get('OPENAI_API_KEY', '')
-    anthropic_key = ENV_VARS.get('ANTHROPIC_API_KEY', '') or os.environ.get('ANTHROPIC_API_KEY', '')
-
+    # Pass env vars to WASM via --env (subprocess env is NOT enough!)
     if openai_key:
-        env['OPENAI_API_KEY'] = openai_key
+        cmd.extend(['--env', f'OPENAI_API_KEY={openai_key}'])
         print(f"  ✓ OPENAI_API_KEY: {openai_key[:20]}...")
     else:
         print(f"  ⚠️  OPENAI_API_KEY not found (check .env or export)")
 
     if anthropic_key:
-        env['ANTHROPIC_API_KEY'] = anthropic_key
+        cmd.extend(['--env', f'ANTHROPIC_API_KEY={anthropic_key}'])
         print(f"  ✓ ANTHROPIC_API_KEY: {anthropic_key[:20]}...")
+
+    cmd.append(str(wasm_file))
+
+    print(f"  Starting wasmtime serve on port {port}...")
+    print(f"  Command: {' '.join(cmd[:8])}... {wasm_file.name}")  # Don't print API keys
+
+    # Prepare environment (for subprocess itself, not WASM)
+    env = os.environ.copy()
 
     # Start process with environment variables
     process = subprocess.Popen(
