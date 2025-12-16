@@ -114,10 +114,12 @@ def get_test_payloads():
 
         # Summarize (3)
         'summarize_text': {'text': 'Lorem ipsum ' * 500, 'max_length': 100},
-        'summarize_documents': {'documents': [
-            {'title': 'doc1', 'content': 'Lorem ipsum ' * 200},
-            {'title': 'doc2', 'content': 'Dolor sit amet ' * 200}
-        ]},
+        'summarize_documents': {
+            'documents': json.dumps([
+                {'title': 'doc1', 'content': 'Lorem ipsum ' * 200},
+                {'title': 'doc2', 'content': 'Dolor sit amet ' * 200}
+            ])
+        },
         'get_provider_info': {},
 
         # Log Parser (5)
@@ -224,8 +226,23 @@ async def measure_server_tools(server_name, tools_to_measure, test_payloads, run
         http_required_servers = {'fetch', 'summarize'}
         if server_name in http_required_servers:
             print(f"  ℹ️  Adding HTTP support for {server_name}")
-            # Modify args to add --wasi http flag
-            server_config.config['args'] = ["run", "--wasi", "http", "--dir=/tmp", str(wasm_file)]
+
+            # Get API keys from environment
+            import os
+            openai_key = os.getenv('OPENAI_API_KEY', '')
+            anthropic_key = os.getenv('ANTHROPIC_API_KEY', '')
+
+            # Build args with environment variables
+            args = ["run", "--wasi", "http", "--dir=/tmp"]
+
+            # Pass API keys to WASM if available
+            if openai_key:
+                args.extend(["--env", f"OPENAI_API_KEY={openai_key}"])
+            if anthropic_key:
+                args.extend(["--env", f"ANTHROPIC_API_KEY={anthropic_key}"])
+
+            args.append(str(wasm_file))
+            server_config.config['args'] = args
 
         # Create client and open session once for all tools
         client = MultiServerMCPClient({server_name: server_config.config})

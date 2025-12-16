@@ -30,6 +30,11 @@ if [ -d "/tmp/git_repo" ]; then
         echo "Git repo initialized"
     fi
 
+    # Configure git user for this repo
+    git config user.name "Test User"
+    git config user.email "test@example.com"
+    echo "Git user configured"
+
     # Create README if it doesn't exist
     if [ ! -f "README.md" ]; then
         echo "# Test Repository" > README.md
