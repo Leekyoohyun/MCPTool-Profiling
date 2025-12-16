@@ -217,20 +217,15 @@ async def measure_server_tools(server_name, tools_to_measure, test_payloads, run
     results = []
 
     try:
-        # Create MCP server config with HTTP support for fetch/summarize
+        # Create MCP server config
+        server_config = MCPServerConfig.wasmmcp_stdio("/tmp", str(wasm_file))
+
+        # Add HTTP support for fetch/summarize servers
         http_required_servers = {'fetch', 'summarize'}
         if server_name in http_required_servers:
-            print(f"  ℹ️  Using HTTP support for {server_name}")
-            server_config = MCPServerConfig(
-                transport=TransportType.STDIO,
-                config={
-                    "command": "wasmtime",
-                    "args": ["run", "--wasi", "http", "--dir=/tmp", str(wasm_file)],
-                    "transport": "stdio"
-                }
-            )
-        else:
-            server_config = MCPServerConfig.wasmmcp_stdio("/tmp", str(wasm_file))
+            print(f"  ℹ️  Adding HTTP support for {server_name}")
+            # Modify args to add --wasi http flag
+            server_config.config['args'] = ["run", "--wasi", "http", "--dir=/tmp", str(wasm_file)]
 
         # Create client and open session once for all tools
         client = MultiServerMCPClient({server_name: server_config.config})
