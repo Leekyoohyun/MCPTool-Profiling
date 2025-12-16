@@ -3,7 +3,7 @@
 Phase 2E: Measure Cloud WASM Tool Execution Time
 
 클라우드에서 WASM 서버로 tool 실행 시간 측정
-- Edge와 동일한 WASM 사용
+- Edge와 동일한 WASM 사용 (MCP 클라이언트 라이브러리 사용)
 - 동일한 50MB 표준 payload 사용
 - 공정한 비교 가능
 
@@ -16,9 +16,10 @@ Output:
 Requirements:
     - wasmtime 설치: curl https://wasmtime.dev/install.sh -sSf | bash
     - WASM 빌드: cd wasm_mcp && cargo build --target wasm32-wasip2 --release
+    - pip install langchain-mcp-adapters
 """
 
-import subprocess
+import asyncio
 import json
 import time
 import sys
@@ -29,6 +30,31 @@ from pathlib import Path
 # Import standard payloads
 sys.path.insert(0, str(Path(__file__).parent))
 from standard_payloads import get_standard_payloads
+
+# WASM MCP test utilities path (for MCPServerConfig)
+WASM_MCP_TEST_PATH_CANDIDATES = [
+    Path.home() / "CCGrid-2026/EdgeAgent/EdgeAgent/wasm_mcp/tests",  # AWS EC2
+    Path.home() / "EdgeAgent/wasm_mcp/tests",  # Nodes
+    Path.home() / "DDPS/undergraduated/CCGrid-2026/EdgeAgent/EdgeAgent/wasm_mcp/tests",  # MacBook
+]
+
+# Add wasm_mcp/tests to path for MCPServerConfig
+for test_path in WASM_MCP_TEST_PATH_CANDIDATES:
+    if test_path.exists():
+        sys.path.insert(0, str(test_path))
+        break
+
+# Import MCP client libraries (same as 2b_measure_simple_tools.py)
+try:
+    from mcp_comparator import MCPServerConfig, TransportType
+    from langchain_mcp_adapters.client import MultiServerMCPClient
+    from langchain_mcp_adapters.tools import load_mcp_tools
+except ImportError as e:
+    print(f"❌ Missing required library: {e}")
+    print("\nInstall required packages:")
+    print("  pip install langchain-mcp-adapters")
+    print("\nEnsure wasm_mcp/tests is in path for MCPServerConfig")
+    sys.exit(1)
 
 # WASM server path
 WASM_PATH_CANDIDATES = [
@@ -90,111 +116,109 @@ TOOLS_BY_SERVER = {
 NUM_RUNS = 3
 
 
-def check_wasmtime():
-    """Check if wasmtime is available"""
-    try:
-        result = subprocess.run(['wasmtime', '--version'], capture_output=True, text=True)
-        if result.returncode == 0:
-            print(f"✓ wasmtime: {result.stdout.strip()}")
-            return True
-    except FileNotFoundError:
-        pass
-
-    print("❌ wasmtime not found!")
-    print("\nInstall wasmtime:")
-    print("  curl https://wasmtime.dev/install.sh -sSf | bash")
-    return False
-
-
-def measure_tool_wasm(tool_name, server_name, payload, runs=NUM_RUNS):
-    """Measure WASM tool execution time using wasmtime"""
-
-    wasm_file = WASM_PATH / SERVER_WASM_MAP.get(server_name, '')
-    if not wasm_file.exists():
-        print(f"\n    ⚠️  WASM file not found: {wasm_file}")
-        return None
-
-    # Build JSON-RPC request
-    request = {
-        'jsonrpc': '2.0',
-        'method': 'tools/call',
-        'params': {
-            'name': tool_name,
-            'arguments': payload
-        },
-        'id': 1
-    }
-
-    request_json = json.dumps(request)
-
-    # Calculate input size (same as Edge measurement)
-    if tool_name in ['get_image_info', 'resize_image', 'compute_image_hash', 'batch_resize']:
-        input_size = 50 * 1024 * 1024  # 50MB image
-    elif tool_name in ['read_file', 'read_text_file', 'read_media_file']:
-        input_size = 50 * 1024 * 1024  # 50MB file
-    elif tool_name == 'read_multiple_files':
-        input_size = 100 * 1024 * 1024  # 2x 50MB files
-    elif tool_name == 'sequentialthinking':
-        input_size = 50 * 1024 * 1024  # Record 50MB for fair comparison
-    else:
-        input_size = len(request_json)
-
+async def measure_tool(session, tool_name, tool_func, arguments, runs=NUM_RUNS):
+    """Measure tool execution time using MCP client"""
     exec_times = []
     output_size = 0
-
-    # Determine wasmtime args based on server
-    if server_name == 'fetch':
-        cmd = ['wasmtime', 'run', '--wasi', 'http', '--dir=/tmp', str(wasm_file)]
-    else:
-        cmd = ['wasmtime', 'run', '--dir=/tmp', str(wasm_file)]
 
     for run in range(runs):
         try:
             start = time.perf_counter()
-
-            proc = subprocess.run(
-                cmd,
-                input=request_json,
-                capture_output=True,
-                text=True,
-                timeout=120  # 2 minutes timeout for large payloads
-            )
-
+            result = await tool_func.ainvoke(arguments)
             end = time.perf_counter()
 
-            if proc.returncode == 0:
-                try:
-                    response = json.loads(proc.stdout)
-                    output_size = len(json.dumps(response))
-                    exec_times.append(end - start)
-                except json.JSONDecodeError:
-                    output_size = len(proc.stdout)
-                    exec_times.append(end - start)
-            else:
-                print(f"\n    Run {run+1} failed: {proc.stderr[:200]}")
+            exec_times.append(end - start)
+            output_size = len(str(result))
 
-        except subprocess.TimeoutExpired:
-            print(f"\n    Run {run+1} timeout")
         except Exception as e:
-            print(f"\n    Run {run+1} error: {e}")
+            print(f"\n    Run {run+1} failed: {e}")
+            continue
 
-    if not exec_times:
-        return None
-
-    avg_exec_time = sum(exec_times) / len(exec_times)
-
-    return {
-        'tool_name': tool_name,
-        'server': server_name,
-        't_exec': avg_exec_time,  # seconds
-        'input_size': input_size,
-        'output_size': output_size,
-        'runs': len(exec_times),
-        'measurements': exec_times  # seconds
-    }
+    return exec_times, output_size
 
 
-def main():
+async def measure_server_tools(server_name, tool_names, test_payloads, runs=NUM_RUNS):
+    """Measure all tools for a single WASM server using MCP client"""
+
+    wasm_file = WASM_PATH / SERVER_WASM_MAP.get(server_name, '')
+    if not wasm_file.exists():
+        print(f"  ⚠️  WASM file not found: {wasm_file}")
+        return []
+
+    print(f"\n{'='*60}")
+    print(f"Server: {server_name} ({len(tool_names)} tools) - WASM")
+    print(f"WASM: {wasm_file.name}")
+    print(f"{'='*60}")
+
+    results = []
+
+    try:
+        # Create MCP server config for WASM (same as 2b_measure_simple_tools.py)
+        server_config = MCPServerConfig.wasmmcp_stdio("/tmp", str(wasm_file))
+
+        # Create MCP client
+        client = MultiServerMCPClient({server_name: server_config.config})
+
+        async with client.session(server_name) as session:
+            # Load tools
+            tools = await load_mcp_tools(session)
+            tool_map = {t.name: t for t in tools}
+
+            available_tools = list(tool_map.keys())
+            print(f"  Available tools: {available_tools}")
+
+            for tool_name in tool_names:
+                if tool_name not in test_payloads:
+                    print(f"  ⚠️  {tool_name}: No test payload")
+                    continue
+
+                if tool_name not in tool_map:
+                    print(f"  ⚠️  {tool_name}: Not found in server")
+                    continue
+
+                print(f"  Measuring {tool_name}...", end=' ', flush=True)
+
+                payload = test_payloads[tool_name]
+
+                # Calculate input size (same as Edge measurement)
+                if tool_name in ['get_image_info', 'resize_image', 'compute_image_hash', 'batch_resize']:
+                    input_size = 50 * 1024 * 1024  # 50MB image
+                elif tool_name in ['read_file', 'read_text_file', 'read_media_file']:
+                    input_size = 50 * 1024 * 1024  # 50MB file
+                elif tool_name == 'read_multiple_files':
+                    input_size = 100 * 1024 * 1024  # 2x 50MB files
+                elif tool_name == 'sequentialthinking':
+                    input_size = 50 * 1024 * 1024  # Record 50MB for fair comparison
+                else:
+                    input_size = len(json.dumps(payload))
+
+                tool_func = tool_map[tool_name]
+                exec_times, output_size = await measure_tool(session, tool_name, tool_func, payload, runs)
+
+                if exec_times:
+                    avg_exec_time = sum(exec_times) / len(exec_times)
+                    results.append({
+                        'tool_name': tool_name,
+                        'server': server_name,
+                        't_exec': avg_exec_time,  # seconds
+                        'input_size': input_size,
+                        'output_size': output_size,
+                        'runs': len(exec_times),
+                        'measurements': exec_times  # seconds
+                    })
+                    print(f"✓ {avg_exec_time:.3f}s ({avg_exec_time*1000:.1f}ms)")
+                else:
+                    print(f"❌ All runs failed")
+
+    except Exception as e:
+        print(f"  ❌ Server error: {e}")
+        import traceback
+        traceback.print_exc()
+
+    return results
+
+
+async def main():
     print("="*60)
     print("Phase 2E: Cloud WASM Tool Measurement")
     print("="*60)
@@ -203,10 +227,6 @@ def main():
     hostname = socket.gethostname()
     print(f"Hostname: {hostname}")
     print()
-
-    # Check wasmtime
-    if not check_wasmtime():
-        return
 
     print(f"WASM Path: {WASM_PATH}")
     if WASM_PATH and WASM_PATH.exists():
@@ -233,31 +253,11 @@ def main():
 
     # Measure each server
     for server_name, tool_names in TOOLS_BY_SERVER.items():
-        wasm_file = WASM_PATH / SERVER_WASM_MAP.get(server_name, '')
-        if not wasm_file.exists():
-            print(f"\n⚠️  Skipping {server_name}: WASM file not found")
-            continue
-
-        print(f"\n{'='*60}")
-        print(f"Server: {server_name} ({len(tool_names)} tools) - WASM")
-        print(f"WASM: {wasm_file.name}")
-        print(f"{'='*60}")
-
-        for tool_name in tool_names:
-            if tool_name not in test_payloads:
-                print(f"  ⚠️  {tool_name}: No test payload")
-                continue
-
-            print(f"  Measuring {tool_name}...", end=' ', flush=True)
-
-            payload = test_payloads[tool_name]
-            result = measure_tool_wasm(tool_name, server_name, payload)
-
-            if result:
-                all_results.append(result)
-                print(f"✓ {result['t_exec']:.3f}s ({result['t_exec']*1000:.1f}ms)")
-            else:
-                print(f"❌ Failed")
+        try:
+            results = await measure_server_tools(server_name, tool_names, test_payloads, runs=NUM_RUNS)
+            all_results.extend(results)
+        except Exception as e:
+            print(f"  ❌ Server {server_name} failed: {e}")
 
     # Save results
     output_file = f'cloud_wasm_tool_exec_time_{hostname}.json'
@@ -280,4 +280,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
