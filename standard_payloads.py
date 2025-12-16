@@ -88,10 +88,11 @@ def get_standard_payloads():
         },
 
         # ============================================================
-        # Summarize (3 tools) - All 50MB input
+        # Summarize (3 tools) - Small payload (OpenAI API limitation)
+        # Note: 5KB is realistic for summarization tasks
         # ============================================================
         'summarize_text': {
-            'text': text_50mb,
+            'text': (STANDARD_TEXT_500B + "\n") * 10,  # 5KB
             'max_length': 100
         },
         'summarize_documents': {

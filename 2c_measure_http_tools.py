@@ -98,7 +98,7 @@ def start_wasmtime_server(wasm_file, port=8000):
     # Add WASM-specific args
     cmd.extend([
         '--addr', f'127.0.0.1:{port}',
-        '--wasi', 'http',
+        '--wasi', 'cli+http',  # CLI + HTTP support
         '--dir=/tmp',
     ])
 
