@@ -202,77 +202,97 @@ def get_test_payloads():
     }
 
 
-async def measure_tool_wasm_mcp(tool_name, server_name, payload, runs=3):
-    """Measure WASM tool using MCP client"""
-    print(f"  Measuring {tool_name} (WASM via MCP)...")
+async def measure_server_tools(server_name, tools_to_measure, test_payloads, runs=3):
+    """Measure all tools for a single server in one session"""
 
-    # Skip servers that require HTTP (not supported in stdio transport)
+    # Skip HTTP-required servers
     http_required_servers = {'fetch', 'summarize'}
     if server_name in http_required_servers:
-        print(f"    ⚠️  Skipped: {server_name} requires HTTP (not available in stdio)")
-        return None
+        print(f"  ⚠️  Skipping {server_name}: requires HTTP (not available in stdio)")
+        return []
 
     # Get WASM file
     wasm_file = WASM_PATH / SERVER_WASM_MAP.get(server_name)
-
     if not wasm_file.exists():
-        print(f"    ⚠️  WASM file not found: {wasm_file}")
-        return None
+        print(f"  ⚠️  WASM file not found for {server_name}: {wasm_file}")
+        return []
 
-    # Create MCP server config
-    server_config = MCPServerConfig.wasmmcp_stdio("/tmp", str(wasm_file))
+    print(f"\n{'='*60}")
+    print(f"Server: {server_name} ({len(tools_to_measure)} tools)")
+    print(f"{'='*60}")
 
-    # Measure execution times
-    exec_times = []
-    output_size = 0
-    input_size = sys.getsizeof(json.dumps(payload))
+    results = []
 
-    for run in range(runs):
-        try:
-            # Create MCP client (new API as of 0.1.0)
-            client = MultiServerMCPClient({server_name: server_config.config})
+    try:
+        # Create MCP server config
+        server_config = MCPServerConfig.wasmmcp_stdio("/tmp", str(wasm_file))
 
-            async with client.session(server_name) as session:
-                # Load tools
-                tools = await load_mcp_tools(session)
+        # Create client and open session once for all tools
+        client = MultiServerMCPClient({server_name: server_config.config})
 
-                # Find the tool
-                tool_obj = None
-                for t in tools:
-                    if t.name == tool_name:
-                        tool_obj = t
-                        break
+        async with client.session(server_name) as session:
+            # Load tools once
+            tools = await load_mcp_tools(session)
 
-                if tool_obj is None:
-                    print(f"    ⚠️  Tool not found: {tool_name}")
-                    return None
+            # Create tool map
+            tool_map = {t.name: t for t in tools}
 
-                # Measure execution
-                start = time.time()
-                result = await tool_obj.ainvoke(payload)
-                end = time.time()
+            # Measure each tool
+            for tool_info in tools_to_measure:
+                tool_name = tool_info['name']
 
-                exec_times.append(end - start)
-                output_size = sys.getsizeof(json.dumps(result))
+                if tool_name not in test_payloads:
+                    print(f"  ⚠️  {tool_name}: No test payload, skipping")
+                    continue
 
-        except Exception as e:
-            print(f"    ⚠️  Error: {e}")
-            continue
+                payload = test_payloads[tool_name]
 
-    if not exec_times:
-        return None
+                if tool_name not in tool_map:
+                    print(f"  ⚠️  {tool_name}: Tool not found in server")
+                    continue
 
-    avg_exec_time = sum(exec_times) / len(exec_times)
+                print(f"  Measuring {tool_name}...")
 
-    return {
-        'tool_name': tool_name,
-        'server': server_name,
-        't_exec': avg_exec_time,
-        'input_size': input_size,
-        'output_size': output_size,
-        'runs': runs,
-        'measurements': exec_times
-    }
+                tool_obj = tool_map[tool_name]
+                exec_times = []
+                output_size = 0
+                input_size = sys.getsizeof(json.dumps(payload))
+
+                # Run multiple times
+                for run in range(runs):
+                    try:
+                        start = time.time()
+                        result = await tool_obj.ainvoke(payload)
+                        end = time.time()
+
+                        exec_times.append(end - start)
+                        output_size = sys.getsizeof(json.dumps(result))
+                    except Exception as e:
+                        print(f"    ⚠️  Run {run+1} failed: {e}")
+                        continue
+
+                if exec_times:
+                    avg_exec_time = sum(exec_times) / len(exec_times)
+                    results.append({
+                        'tool_name': tool_name,
+                        'server': server_name,
+                        't_exec': avg_exec_time,
+                        'input_size': input_size,
+                        'output_size': output_size,
+                        'runs': len(exec_times),
+                        'measurements': exec_times
+                    })
+                    print(f"    ✓ {avg_exec_time:.3f}s (avg of {len(exec_times)} runs)")
+                else:
+                    print(f"    ❌ All runs failed")
+
+        # Give WASM time to clean up
+        await asyncio.sleep(0.5)
+
+    except Exception as e:
+        print(f"  ❌ Server error: {e}")
+
+    return results
 
 
 async def main():
@@ -296,38 +316,34 @@ async def main():
     # Get test payloads
     TEST_PAYLOADS = get_test_payloads()
 
+    # Group tools by server
     all_tools = get_all_tools()
-    results = []
+    tools_by_server = {}
+    for tool in all_tools:
+        server_name = tool['server']
+        if server_name not in tools_by_server:
+            tools_by_server[server_name] = []
+        tools_by_server[server_name].append(tool)
 
-    print(f"Total tools to measure: {len(all_tools)}")
+    print(f"Total: {len(all_tools)} tools across {len(tools_by_server)} servers")
     print()
 
-    for tool in all_tools:
-        tool_name = tool['name']
-        server_name = tool['server']
+    all_results = []
 
-        if tool_name not in TEST_PAYLOADS:
-            print(f"  ⚠️  {tool_name}: No test payload, skipping")
-            continue
-
-        payload = TEST_PAYLOADS[tool_name]
-
-        try:
-            result = await measure_tool_wasm_mcp(tool_name, server_name, payload)
-            if result:
-                results.append(result)
-        except Exception as e:
-            print(f"  ❌ {tool_name}: {e}")
+    # Measure each server
+    for server_name, tools in tools_by_server.items():
+        results = await measure_server_tools(server_name, tools, TEST_PAYLOADS)
+        all_results.extend(results)
 
     # Save results
     output_file = f'wasm_tool_exec_time_{hostname}.json'
     with open(output_file, 'w') as f:
-        json.dump(results, f, indent=2)
+        json.dump(all_results, f, indent=2)
 
     print()
     print("="*60)
     print(f"✓ Results saved: {output_file}")
-    print(f"  Measured {len(results)} tools")
+    print(f"  Measured {len(all_results)}/{len(all_tools)} tools")
     print("="*60)
 
 
