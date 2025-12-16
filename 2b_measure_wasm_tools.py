@@ -265,7 +265,19 @@ def measure_tool_wasm(tool_name, server_name, payload, runs=3):
     }
 
     request_json = json.dumps(request)
-    input_size = sys.getsizeof(request_json)
+
+    # Calculate input size based on actual data processed
+    # File-based tools process 50MB files, not just the JSON payload
+    if tool_name in ['get_image_info', 'resize_image', 'compute_image_hash', 'batch_resize']:
+        input_size = 50 * 1024 * 1024  # 50MB image
+    elif tool_name in ['read_file', 'read_text_file', 'read_media_file']:
+        input_size = 50 * 1024 * 1024  # 50MB file
+    elif tool_name == 'read_multiple_files':
+        input_size = 100 * 1024 * 1024  # 2x 50MB files
+    elif tool_name == 'sequentialthinking':
+        input_size = 50 * 1024 * 1024  # Record 50MB for fair comparison
+    else:
+        input_size = len(request_json)
 
     exec_times = []
     output_size = 0

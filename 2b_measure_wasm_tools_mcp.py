@@ -157,7 +157,19 @@ async def measure_server_tools(server_name, tools_to_measure, test_payloads, run
                 tool_obj = tool_map[tool_name]
                 exec_times = []
                 output_size = 0
-                input_size = sys.getsizeof(json.dumps(payload))
+
+                # Calculate input size based on actual data processed
+                # File-based tools process 50MB files, not just the JSON payload
+                if tool_name in ['get_image_info', 'resize_image', 'compute_image_hash', 'batch_resize']:
+                    input_size = 50 * 1024 * 1024  # 50MB image
+                elif tool_name in ['read_file', 'read_text_file', 'read_media_file']:
+                    input_size = 50 * 1024 * 1024  # 50MB file
+                elif tool_name == 'read_multiple_files':
+                    input_size = 100 * 1024 * 1024  # 2x 50MB files
+                elif tool_name == 'sequentialthinking':
+                    input_size = 50 * 1024 * 1024  # Record 50MB for fair comparison
+                else:
+                    input_size = len(json.dumps(payload))
 
                 # Run multiple times
                 for run in range(runs):
