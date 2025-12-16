@@ -2,7 +2,7 @@
 """
 Standard Test Payloads for WASM Tool Profiling
 
-All payloads are designed to have IDENTICAL input size (10KB)
+All payloads are designed to have IDENTICAL input size (1MB)
 for fair comparison across different nodes and tools.
 
 This ensures Alpha value calculation is meaningful.
@@ -10,8 +10,8 @@ This ensures Alpha value calculation is meaningful.
 
 import json
 
-# Standard sizes - ALL INPUTS MUST BE 10KB
-STANDARD_INPUT_SIZE = 10240  # 10KB for all tools
+# Standard sizes - ALL INPUTS MUST BE 1MB
+STANDARD_INPUT_SIZE = 1024 * 1024  # 1MB for all tools
 
 # Standard test text (approximately 500 bytes)
 STANDARD_TEXT_500B = """
@@ -30,22 +30,22 @@ STANDARD_LOG_ENTRY = "2024-01-01 12:00:00 ERROR [worker-1] service - Processing 
 
 def get_standard_payloads():
     """
-    Generate standard test payloads - ALL 10KB input size
+    Generate standard test payloads - ALL 1MB input size
 
     Returns:
         dict: Tool name -> payload mapping
     """
 
-    # Create 10KB standard text
-    text_10kb = (STANDARD_TEXT_500B + "\n") * 20  # ~10KB
+    # Create 1MB standard text
+    text_1mb = (STANDARD_TEXT_500B + "\n") * 2100  # ~1MB
 
-    # Create 10KB standard log content
-    log_entries_10kb = (STANDARD_LOG_ENTRY + "\n") * 100  # ~10KB
+    # Create 1MB standard log content
+    log_entries_1mb = (STANDARD_LOG_ENTRY + "\n") * 10000  # ~1MB
 
-    # Create standard list items for 10KB JSON payload
+    # Create standard list items for 1MB JSON payload
     # Each item ~85B due to JSON overhead
-    # 120 items = ~10KB
-    list_items_120 = [
+    # 12000 items = ~1MB
+    list_items_12k = [
         {
             'id': i,
             'type': chr(65 + i % 5),
@@ -53,7 +53,7 @@ def get_standard_payloads():
             'category': chr(65 + i % 5),  # Same as type for grouping
             'timestamp': f'2024-01-{(i%30)+1:02d}'  # For trends
         }
-        for i in range(120)
+        for i in range(12000)
     ]
 
     return {
@@ -73,7 +73,7 @@ def get_standard_payloads():
         # Sequential Thinking (1 tool) - 10KB thought
         # ============================================================
         'sequentialthinking': {
-            'thought': text_10kb,
+            'thought': text_3p5kb,
             'nextThoughtNeeded': False,
             'thoughtNumber': 1,
             'totalThoughts': 1
@@ -90,7 +90,7 @@ def get_standard_payloads():
         # Summarize (3 tools) - All 10KB input
         # ============================================================
         'summarize_text': {
-            'text': text_10kb,
+            'text': text_3p5kb,
             'max_length': 100
         },
         'summarize_documents': {
@@ -105,7 +105,7 @@ def get_standard_payloads():
         # Log Parser (5 tools) - All 10KB input
         # ============================================================
         'parse_logs': {
-            'log_content': log_entries_10kb,
+            'log_content': log_entries_3p5kb,
             'format_type': 'auto'
         },
         'filter_entries': {
@@ -152,7 +152,7 @@ def get_standard_payloads():
         # Data Aggregate (5 tools) - All 10KB input
         # ============================================================
         'aggregate_list': {
-            'items': list_items_120,  # 120 items = ~10KB
+            'items': list_items_42,  # 120 items = ~10KB
             'group_by': 'category'
         },
         'merge_summaries': {
@@ -188,7 +188,7 @@ def get_standard_payloads():
             'key_fields': ['name']
         },
         'compute_trends': {
-            'time_series': list_items_120,  # 120 items = ~10KB
+            'time_series': list_items_42,  # 120 items = ~10KB
             'bucket_count': 10
         },
 
@@ -197,14 +197,14 @@ def get_standard_payloads():
         # Note: Payload is small, but processed file is 10KB
         # ============================================================
         'get_image_info': {
-            'image_path': '/tmp/test_10kb.png'
+            'image_path': '/tmp/test_50mb.png'
         },
         'resize_image': {
-            'image_path': '/tmp/test_10kb.png',
+            'image_path': '/tmp/test_50mb.png',
             'max_size': 800
         },
         'compute_image_hash': {
-            'image_path': '/tmp/test_10kb.png'
+            'image_path': '/tmp/test_50mb.png'
         },
         'compare_hashes': {
             'hashes': [
@@ -216,7 +216,7 @@ def get_standard_payloads():
             ]
         },
         'batch_resize': {
-            'image_paths': ['/tmp/test_10kb.png'] * 5,  # 5 images
+            'image_paths': ['/tmp/test_50mb.png'] * 5,  # 5 images
             'max_size': 800
         },
 
@@ -225,23 +225,23 @@ def get_standard_payloads():
         # Note: Payload is small, but processed file is 10KB
         # ============================================================
         'read_file': {
-            'path': '/tmp/test_10kb.txt'
+            'path': '/tmp/test_50mb.txt'
         },
         'read_text_file': {
-            'path': '/tmp/test_10kb.txt'
+            'path': '/tmp/test_50mb.txt'
         },
         'read_media_file': {
-            'path': '/tmp/test_10kb.png'
+            'path': '/tmp/test_50mb.png'
         },
         'read_multiple_files': {
-            'paths': ['/tmp/test_10kb.txt', '/tmp/test_10kb.json']
+            'paths': ['/tmp/test_50mb.txt', '/tmp/test_50mb.json']
         },
         'write_file': {
             'path': '/tmp/test_write.txt',
-            'content': text_10kb  # 10KB content
+            'content': text_3p5kb  # 10KB content
         },
         'edit_file': {
-            'path': '/tmp/test_10kb.txt',
+            'path': '/tmp/test_50mb.txt',
             'edits': [{'oldText': 'Lorem', 'newText': 'LOREM'}],
             'dryRun': True
         },

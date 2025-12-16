@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
 """
-Phase 2B: Measure Simple WASM Tools (no git/filesystem)
+Phase 2B: Measure Simple WASM Tools (no git/filesystem/summarize)
 
-Git과 Filesystem을 제외한 나머지 도구들만 측정:
+Git, Filesystem, Summarize를 제외한 나머지 도구들만 측정:
 - Time (2개)
 - Sequential Thinking (1개)
 - Fetch (1개)
-- Summarize (3개)
 - Log Parser (5개)
 - Data Aggregate (5개)
-- Image Resize (6개)
+- Image Resize (5개)
 
-총 23개 도구
+총 19개 도구 (Summarize는 4KB stdio limit으로 제외)
 """
 
 import asyncio
@@ -80,12 +79,13 @@ SERVER_WASM_MAP = {
 # Note: Using standard payloads from standard_payloads.py
 # All payloads are standardized to ~2KB for fair comparison across nodes
 
-# Tool definitions (no git/filesystem)
+# Tool definitions (no git/filesystem/summarize)
+# Note: Summarize excluded due to WASM 4KB stdio buffer limit
 TOOLS_BY_SERVER = {
     'time': ['get_current_time', 'convert_time'],
     'sequentialthinking': ['sequentialthinking'],
     'fetch': ['fetch'],
-    'summarize': ['summarize_text', 'summarize_documents', 'get_provider_info'],
+    # 'summarize': ['summarize_text', 'summarize_documents', 'get_provider_info'],  # EXCLUDED: 4KB limit
     'log_parser': ['parse_logs', 'filter_entries', 'compute_log_statistics', 'search_entries', 'extract_time_range'],
     'data_aggregate': ['aggregate_list', 'merge_summaries', 'combine_research_results', 'deduplicate', 'compute_trends'],
     'image_resize': ['get_image_info', 'resize_image', 'compute_image_hash', 'compare_hashes', 'batch_resize'],

@@ -2,7 +2,7 @@
 """
 Generate test data for MCP tool profiling
 
-ALL test files are 10KB for fair Alpha value calculation
+File-based tools use 50MB files for meaningful execution time
 """
 
 import os
@@ -22,39 +22,39 @@ except ImportError:
 
 
 def generate_images(output_dir):
-    """Generate 10KB test image"""
+    """Generate 50MB test image"""
     if not HAS_IMAGE_LIBS:
         print("Skipping image generation (PIL/numpy required)")
         return
 
-    print("Generating 10KB test image...")
+    print("Generating 50MB test image...")
     os.makedirs(output_dir, exist_ok=True)
 
-    # Generate a small image that will be ~10KB when saved as PNG
-    # 60x60 pixels = ~10KB PNG file (random data doesn't compress well)
-    filename = "test_10kb.png"
+    # Generate a large image ~50MB
+    # 4000x4000 pixels RGB = ~48MB uncompressed
+    filename = "test_50mb.png"
     output_path = output_dir / filename
 
     if output_path.exists():
         print(f"  ✓ {filename} already exists")
         return
 
-    print(f"  Generating {filename} (60x60 pixels for ~10KB file)...")
+    print(f"  Generating {filename} (4000x4000 pixels for ~50MB file)...")
     np.random.seed(42)
-    data = np.random.randint(0, 255, (60, 60, 3), dtype=np.uint8)
+    data = np.random.randint(0, 255, (4000, 4000, 3), dtype=np.uint8)
     img = Image.fromarray(data)
-    img.save(output_path, "PNG", compress_level=0)  # No compression for consistent size
-    size_kb = output_path.stat().st_size / 1024
-    print(f"    → {size_kb:.1f} KB")
+    img.save(output_path, "PNG", compress_level=0)  # No compression
+    size_mb = output_path.stat().st_size / (1024 * 1024)
+    print(f"    → {size_mb:.1f} MB")
 
 
 def generate_logs(output_dir):
-    """Generate 10KB log file"""
-    print("Generating 10KB log file...")
+    """Generate 50MB log file"""
+    print("Generating 50MB log file...")
     os.makedirs(output_dir, exist_ok=True)
 
-    filename = "test_10kb.log"
-    target_bytes = 10_240  # 10KB
+    filename = "test_50mb.log"
+    target_bytes = 50 * 1024 * 1024  # 50MB
 
     levels = ["DEBUG", "INFO", "WARNING", "ERROR"]
     workers = range(1, 10)
@@ -64,7 +64,7 @@ def generate_logs(output_dir):
         print(f"  ✓ {filename} already exists")
         return
 
-    print(f"  Generating {filename} (~10KB)...")
+    print(f"  Generating {filename} (~50MB)...")
 
     current_bytes = 0
     req_id = 1000
@@ -83,18 +83,18 @@ def generate_logs(output_dir):
             req_id += 1
             dt += timedelta(seconds=random.randint(1, 5))
 
-    size_kb = output_path.stat().st_size / 1024
-    print(f"    → {size_kb:.1f} KB")
+    size_mb = output_path.stat().st_size / (1024 * 1024)
+    print(f"    → {size_mb:.1f} MB")
 
 
 def generate_json_data(output_dir):
-    """Generate 10KB JSON file"""
-    print("Generating 10KB JSON file...")
+    """Generate 50MB JSON file"""
+    print("Generating 50MB JSON file...")
     os.makedirs(output_dir, exist_ok=True)
 
-    filename = "test_10kb.json"
-    # ~80 items = ~10KB JSON (with indent=2)
-    item_count = 80
+    filename = "test_50mb.json"
+    # ~400K items = ~50MB JSON (with indent=2)
+    item_count = 400000
 
     categories = ["A", "B", "C", "D", "E"]
     base_date = datetime(2024, 12, 1, 0, 0, 0)
@@ -120,17 +120,17 @@ def generate_json_data(output_dir):
     with open(output_path, 'w') as f:
         json.dump(items, f, indent=2)
 
-    size_kb = output_path.stat().st_size / 1024
-    print(f"    → {size_kb:.1f} KB")
+    size_mb = output_path.stat().st_size / (1024 * 1024)
+    print(f"    → {size_mb:.1f} MB")
 
 
 def generate_text_files(output_dir):
-    """Generate 10KB text file"""
-    print("Generating 10KB text file...")
+    """Generate 50MB text file"""
+    print("Generating 50MB text file...")
     os.makedirs(output_dir, exist_ok=True)
 
-    filename = "test_10kb.txt"
-    target_bytes = 10_240  # 10KB
+    filename = "test_50mb.txt"
+    target_bytes = 50 * 1024 * 1024  # 50MB
 
     sample_text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " * 10
 
@@ -147,8 +147,8 @@ def generate_text_files(output_dir):
             f.write(sample_text + "\n")
             current_bytes += len(sample_text) + 1
 
-    size_kb = output_path.stat().st_size / 1024
-    print(f"    → {size_kb:.1f} KB")
+    size_mb = output_path.stat().st_size / (1024 * 1024)
+    print(f"    → {size_mb:.1f} MB")
 
 
 def create_git_repo(output_dir):
@@ -168,7 +168,7 @@ def create_git_repo(output_dir):
 
 def main():
     print("="*60)
-    print("Test Data Generation - ALL 10KB Files")
+    print("Test Data Generation - ALL 50MB Files")
     print("="*60)
     print()
 
@@ -176,7 +176,7 @@ def main():
     base_dir = Path("test_data")
     base_dir.mkdir(exist_ok=True)
 
-    # Generate each type of test data - ALL 10KB
+    # Generate each type of test data - ALL 50MB
     generate_images(base_dir)
     generate_logs(base_dir)
     generate_json_data(base_dir)
@@ -186,7 +186,7 @@ def main():
     print()
     print("="*60)
     print("✓ Test data generation complete!")
-    print("  All files are 10KB for fair Alpha calculation")
+    print("  All files are 50MB for meaningful execution time")
     print("="*60)
     print()
     print("Next steps:")
