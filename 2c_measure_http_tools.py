@@ -173,13 +173,24 @@ async def call_tool_jsonrpc(client: httpx.AsyncClient, url: str, tool_name: str,
         "id": request_id
     }
     response = await client.post(url, json=payload)
-    response.raise_for_status()
+
+    # Don't use raise_for_status - check response body for actual error
+    if response.status_code >= 400:
+        raise Exception(f"HTTP {response.status_code}: {response.text[:300]}")
+
     result = response.json()
 
     if "error" in result:
         raise Exception(result["error"].get("message", str(result["error"])))
 
-    return result.get("result", {})
+    # Check isError in result content
+    res = result.get("result", {})
+    if res.get("isError"):
+        content = res.get("content", [])
+        if content:
+            raise Exception(content[0].get("text", "Unknown error")[:200])
+
+    return res
 
 
 async def measure_server_tools(server_name, tool_names, test_payloads, port=8000, runs=3):
