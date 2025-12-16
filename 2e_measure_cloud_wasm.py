@@ -32,15 +32,19 @@ from standard_payloads import get_standard_payloads
 
 # WASM server path
 WASM_PATH_CANDIDATES = [
-    Path(os.environ.get('WASM_PATH', '')),  # Environment variable (highest priority)
     Path.home() / "CCGrid-2026/EdgeAgent/EdgeAgent/wasm_mcp/target/wasm32-wasip2/release",  # AWS EC2
     Path.home() / "EdgeAgent/wasm_mcp/target/wasm32-wasip2/release",  # Nodes
     Path.home() / "DDPS/undergraduated/CCGrid-2026/EdgeAgent/EdgeAgent/wasm_mcp/target/wasm32-wasip2/release",  # MacBook
 ]
 
+# Check environment variable first
+env_wasm_path = os.environ.get('WASM_PATH', '')
+if env_wasm_path:
+    WASM_PATH_CANDIDATES.insert(0, Path(env_wasm_path))
+
 WASM_PATH = None
 for path in WASM_PATH_CANDIDATES:
-    if path and path.exists():
+    if path.exists() and list(path.glob('*.wasm')):
         WASM_PATH = path
         break
 
