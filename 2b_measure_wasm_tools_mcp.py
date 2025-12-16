@@ -12,6 +12,25 @@ import sys
 import time
 from pathlib import Path
 
+# Load .env file
+def load_env_file(env_path=None):
+    """Load API keys from .env file"""
+    if env_path is None:
+        env_path = Path(__file__).parent / ".env"
+
+    env_vars = {}
+    if env_path.exists():
+        with open(env_path, 'r') as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    env_vars[key.strip()] = value.strip()
+    return env_vars
+
+# Load API keys
+ENV_VARS = load_env_file()
+
 # Import EdgeAgent's MCP comparator framework
 sys.path.insert(0, str(Path.home() / "EdgeAgent/wasm_mcp/tests"))
 from mcp_comparator import MCPServerConfig, TransportType
@@ -227,18 +246,22 @@ async def measure_server_tools(server_name, tools_to_measure, test_payloads, run
         if server_name in http_required_servers:
             print(f"  ℹ️  Adding HTTP support for {server_name}")
 
-            # Get API keys from environment
-            import os
-            openai_key = os.getenv('OPENAI_API_KEY', '')
-            anthropic_key = os.getenv('ANTHROPIC_API_KEY', '')
+            # Get API keys from .env file
+            openai_key = ENV_VARS.get('OPENAI_API_KEY', '')
+            anthropic_key = ENV_VARS.get('ANTHROPIC_API_KEY', '')
 
             # Build args with environment variables
             args = ["run", "--wasi", "http", "--dir=/tmp"]
 
             # Pass API keys to WASM if available
             if openai_key:
+                print(f"  ✓ Using OpenAI API key: {openai_key[:10]}...")
                 args.extend(["--env", f"OPENAI_API_KEY={openai_key}"])
+            else:
+                print(f"  ⚠️  No OpenAI API key found in .env file")
+
             if anthropic_key:
+                print(f"  ✓ Using Anthropic API key: {anthropic_key[:10]}...")
                 args.extend(["--env", f"ANTHROPIC_API_KEY={anthropic_key}"])
 
             args.append(str(wasm_file))
