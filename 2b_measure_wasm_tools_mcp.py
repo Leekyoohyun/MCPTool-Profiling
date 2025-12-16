@@ -115,10 +115,10 @@ def get_test_payloads():
         # Summarize (3)
         'summarize_text': {'text': 'Lorem ipsum ' * 500, 'max_length': 100},
         'summarize_documents': {
-            'documents': json.dumps([
+            'documents': [
                 {'title': 'doc1', 'content': 'Lorem ipsum ' * 200},
                 {'title': 'doc2', 'content': 'Dolor sit amet ' * 200}
-            ])
+            ]
         },
         'get_provider_info': {},
 
