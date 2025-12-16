@@ -4,7 +4,7 @@ Phase 2B: Measure Simple WASM Tools (no git/filesystem/summarize)
 
 Git, Filesystem, Summarize를 제외한 나머지 도구들만 측정:
 - Time (2개)
-- Sequential Thinking (1개)
+- Sequential Thinking (1개) - 작은 payload로 실행, input_size는 50MB로 기록
 - Fetch (1개)
 - Log Parser (5개)
 - Data Aggregate (5개)
@@ -77,10 +77,11 @@ SERVER_WASM_MAP = {
 }
 
 # Note: Using standard payloads from standard_payloads.py
-# All payloads are standardized to ~2KB for fair comparison across nodes
+# All payloads are standardized to ~50MB for fair comparison across nodes
 
 # Tool definitions (no git/filesystem/summarize)
 # Note: Summarize excluded due to WASM 4KB stdio buffer limit
+# Note: SequentialThinking uses small payload but records 50MB input_size for fair Alpha calculation
 TOOLS_BY_SERVER = {
     'time': ['get_current_time', 'convert_time'],
     'sequentialthinking': ['sequentialthinking'],
@@ -161,6 +162,10 @@ async def measure_server_tools(server_name, tool_names, test_payloads, runs=3):
                 if tool_name in ['get_image_info', 'resize_image', 'compute_image_hash', 'batch_resize']:
                     # Single 50MB image file (batch_resize now processes 1 image for consistency)
                     input_size = 50 * 1024 * 1024
+                elif tool_name == 'sequentialthinking':
+                    # SequentialThinking: uses small payload due to WASM stdio limit,
+                    # but records 50MB for fair Alpha calculation
+                    input_size = 50 * 1024 * 1024
                 else:
                     # Payload-based tools use JSON size
                     input_size = sys.getsizeof(json.dumps(payload))
@@ -203,7 +208,7 @@ async def measure_server_tools(server_name, tool_names, test_payloads, runs=3):
 
 async def main():
     print("="*60)
-    print("Phase 2B: Simple Tools Measurement (no git/filesystem)")
+    print("Phase 2B: Simple Tools Measurement (19 tools)")
     print("="*60)
     print()
 

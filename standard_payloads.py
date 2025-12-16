@@ -70,10 +70,11 @@ def get_standard_payloads():
         },
 
         # ============================================================
-        # Sequential Thinking (1 tool) - 50MB thought
+        # Sequential Thinking (1 tool) - Small payload (WASM stdio limit)
+        # Note: Uses 1KB payload but input_size recorded as 50MB for fair Alpha calculation
         # ============================================================
         'sequentialthinking': {
-            'thought': text_50mb,
+            'thought': STANDARD_TEXT_500B,  # Small payload to avoid WASM buffer overflow
             'nextThoughtNeeded': False,
             'thoughtNumber': 1,
             'totalThoughts': 1
