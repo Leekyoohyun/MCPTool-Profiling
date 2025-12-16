@@ -71,7 +71,7 @@ SERVER_WASM_MAP = {
 
 # Tools to measure via HTTP
 TOOLS_BY_SERVER = {
-    'summarize': ['summarize_text', 'get_provider_info'],  # summarize_documents는 제외 (너무 큼)
+    'summarize': ['summarize_text', 'summarize_documents', 'get_provider_info'],
 }
 
 

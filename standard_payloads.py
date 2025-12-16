@@ -92,8 +92,9 @@ def get_standard_payloads():
         # Note: 5KB is realistic for summarization tasks
         # ============================================================
         'summarize_text': {
-            'text': (STANDARD_TEXT_500B + "\n") * 4,  # ~2KB (safe for WASM + OpenAI)
-            'max_length': 100
+            'text': (STANDARD_TEXT_500B + "\n") * 200,  # ~100KB
+            'max_length': 100,
+            'style': 'concise'
         },
         'summarize_documents': {
             'documents': [
