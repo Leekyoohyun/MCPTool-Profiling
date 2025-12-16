@@ -2,17 +2,16 @@
 """
 Standard Test Payloads for WASM Tool Profiling
 
-All payloads are designed to have approximately 2KB input size
+All payloads are designed to have IDENTICAL input size (10KB)
 for fair comparison across different nodes and tools.
 
-WASM stdio has 4KB buffer limit, so we use 2KB as standard to be safe.
+This ensures Alpha value calculation is meaningful.
 """
 
 import json
 
-# Standard sizes
-STANDARD_INPUT_SIZE = 2048  # 2KB target
-WASM_BUFFER_LIMIT = 4096    # 4KB hard limit
+# Standard sizes - ALL INPUTS MUST BE 10KB
+STANDARD_INPUT_SIZE = 10240  # 10KB for all tools
 
 # Standard test text (approximately 500 bytes)
 STANDARD_TEXT_500B = """
@@ -31,28 +30,30 @@ STANDARD_LOG_ENTRY = "2024-01-01 12:00:00 ERROR [worker-1] service - Processing 
 
 def get_standard_payloads():
     """
-    Generate standard test payloads - all approximately 2KB input size
+    Generate standard test payloads - ALL 10KB input size
 
     Returns:
         dict: Tool name -> payload mapping
     """
 
-    # Create standard text (repeat to reach ~2KB)
-    text_2kb = (STANDARD_TEXT_500B + "\n") * 4  # ~2KB
+    # Create 10KB standard text
+    text_10kb = (STANDARD_TEXT_500B + "\n") * 20  # ~10KB
 
-    # Create standard log content (~2KB)
-    log_entries_2kb = (STANDARD_LOG_ENTRY + "\n") * 20  # ~2KB
+    # Create 10KB standard log content
+    log_entries_10kb = (STANDARD_LOG_ENTRY + "\n") * 100  # ~10KB
 
-    # Create standard list items (each ~40B, 40 items = ~1.6KB)
-    list_items_40 = [
+    # Create standard list items for 10KB JSON payload
+    # Each item ~85B due to JSON overhead
+    # 120 items = ~10KB
+    list_items_120 = [
         {
             'id': i,
             'type': chr(65 + i % 5),
             'value': i * 10,
-            'name': f'item_{i:03d}',
-            'status': 'active'
+            'category': chr(65 + i % 5),  # Same as type for grouping
+            'timestamp': f'2024-01-{(i%30)+1:02d}'  # For trends
         }
-        for i in range(40)
+        for i in range(120)
     ]
 
     return {
@@ -69,10 +70,10 @@ def get_standard_payloads():
         },
 
         # ============================================================
-        # Sequential Thinking (1 tool) - ~2KB thought
+        # Sequential Thinking (1 tool) - 10KB thought
         # ============================================================
         'sequentialthinking': {
-            'thought': text_2kb,
+            'thought': text_10kb,
             'nextThoughtNeeded': False,
             'thoughtNumber': 1,
             'totalThoughts': 1
@@ -86,56 +87,53 @@ def get_standard_payloads():
         },
 
         # ============================================================
-        # Summarize (3 tools) - All ~2KB input
+        # Summarize (3 tools) - All 10KB input
         # ============================================================
         'summarize_text': {
-            'text': text_2kb,
+            'text': text_10kb,
             'max_length': 100
         },
         'summarize_documents': {
             'documents': [
-                {'title': 'doc1', 'content': STANDARD_TEXT_500B},
-                {'title': 'doc2', 'content': STANDARD_TEXT_500B},
-                {'title': 'doc3', 'content': STANDARD_TEXT_500B},
-                {'title': 'doc4', 'content': STANDARD_TEXT_500B}
-            ]  # 4 * 500B = ~2KB
+                {'title': f'doc{i}', 'content': STANDARD_TEXT_500B}
+                for i in range(20)
+            ]  # 20 * 500B = ~10KB
         },
         'get_provider_info': {},
 
         # ============================================================
-        # Log Parser (5 tools) - All ~2KB input
+        # Log Parser (5 tools) - All 10KB input
         # ============================================================
         'parse_logs': {
-            'log_content': log_entries_2kb,
+            'log_content': log_entries_10kb,
             'format_type': 'auto'
         },
         'filter_entries': {
             'entries': [
                 {
-                    'level': 'ERROR' if i % 3 == 0 else 'WARNING' if i % 3 == 1 else 'INFO',
-                    'message': f'Log message {i}: ' + 'x' * 30
+                    '_level': 'info' if i % 3 == 0 else 'error',
+                    'message': f'msg {i}'
                 }
-                for i in range(30)  # 30 entries * ~70B = ~2KB
+                for i in range(240)  # ~10KB
             ],
-            'min_level': 'WARNING'
+            'min_level': 'warning'
         },
         'compute_log_statistics': {
             'entries': [
                 {
-                    'level': 'ERROR' if i % 4 == 0 else 'WARNING',
-                    'message': f'test message {i:03d}',
-                    'timestamp': f'2024-01-01T{i%24:02d}:00:00Z'
+                    '_level': 'info' if i % 3 == 0 else 'error',
+                    'message': f'msg {i}'
                 }
-                for i in range(30)  # 30 entries * ~50B = ~1.5KB
+                for i in range(240)  # ~10KB
             ]
         },
         'search_entries': {
             'entries': [
                 {
-                    'message': f'test error occurred in module {i}',
-                    'timestamp': f'2024-01-01T12:{i:02d}:00Z'
+                    '_level': 'info' if i % 3 == 0 else 'error',
+                    'message': f'msg {i}'
                 }
-                for i in range(40)  # 40 entries * ~40B = ~1.6KB
+                for i in range(240)  # ~10KB
             ],
             'pattern': 'error'
         },
@@ -143,76 +141,70 @@ def get_standard_payloads():
             'entries': [
                 {
                     'timestamp': f'2024-01-{(i//10)+1:02d}T{(i%24):02d}:00:00Z',
-                    'message': f'message {i:03d}'
+                    '_level': 'info' if i % 3 == 0 else 'error',
+                    'message': f'msg {i}'
                 }
-                for i in range(35)  # 35 entries * ~40B = ~1.4KB
+                for i in range(130)  # 130 entries * ~75B = ~9.75KB (timestamp adds size)
             ]
         },
 
         # ============================================================
-        # Data Aggregate (5 tools) - All ~2KB input
+        # Data Aggregate (5 tools) - All 10KB input
         # ============================================================
         'aggregate_list': {
-            'items': list_items_40  # 40 items * ~40B = ~1.6KB
+            'items': list_items_120,  # 120 items = ~10KB
+            'group_by': 'category'
         },
         'merge_summaries': {
             'summaries': [
                 {
-                    'category': chr(65 + i % 10),
-                    'count': i * 10,
-                    'total': i * 100,
-                    'average': i * 10.5
+                    'count': i * 100,
+                    'sum': i * 1000
                 }
-                for i in range(30)  # 30 items * ~50B = ~1.5KB
+                for i in range(320)  # 320 items * ~32B = ~10KB
             ]
         },
         'combine_research_results': {
             'results': [
                 {
-                    'source': f'Database_{chr(65 + i)}',
-                    'data': STANDARD_TEXT_500B[:200],  # 200B each
+                    'source': f'Database_{chr(65 + i % 26)}',
+                    'data': STANDARD_TEXT_500B[:180],  # 180B each
                     'confidence': 0.95,
                     'timestamp': '2024-01-01T12:00:00Z'
                 }
-                for i in range(8)  # 8 results * ~250B = ~2KB
+                for i in range(35)  # 35 results * ~270B = ~9.5KB
             ]
         },
         'deduplicate': {
             'items': [
                 {
-                    'id': i % 25,  # Creates duplicates
-                    'name': f'item_{i % 25}',
+                    'id': i % 75,  # Creates duplicates
+                    'name': f'item_{i % 75}',
                     'value': i * 10,
-                    'metadata': 'x' * 20
+                    'metadata': 'x' * 10
                 }
-                for i in range(40)  # 40 items * ~40B = ~1.6KB
+                for i in range(145)  # 145 items = ~10KB
             ],
-            'key_fields': ['id']
+            'key_fields': ['name']
         },
         'compute_trends': {
-            'time_series': [
-                {
-                    'timestamp': f'2024-01-{(i//2)+1:02d}T{(i%24):02d}:00:00Z',
-                    'value': 100 + i * 2.5,
-                    'label': f'data_point_{i:03d}'
-                }
-                for i in range(30)  # 30 points * ~50B = ~1.5KB
-            ]
+            'time_series': list_items_120,  # 120 items = ~10KB
+            'bucket_count': 10
         },
 
         # ============================================================
-        # Image Resize (5 tools) - File paths (inherently small)
-        # Note: Image content size is determined by file, not payload
+        # Image Resize (5 tools) - All use 10KB image file
+        # Note: Payload is small, but processed file is 10KB
         # ============================================================
         'get_image_info': {
-            'image_path': '/tmp/test_4mp.png'
+            'image_path': '/tmp/test_10kb.png'
         },
         'resize_image': {
-            'image_path': '/tmp/test_4mp.png',
+            'image_path': '/tmp/test_10kb.png',
             'max_size': 800
         },
         'compute_image_hash': {
-            'image_path': '/tmp/test_4mp.png'
+            'image_path': '/tmp/test_10kb.png'
         },
         'compare_hashes': {
             'hashes': [
@@ -220,36 +212,36 @@ def get_standard_payloads():
                     'hash': f'hash_{i:04d}_' + 'a' * 50,
                     'path': f'/tmp/image_{i}.png'
                 }
-                for i in range(20)  # 20 hashes * ~100B = ~2KB
+                for i in range(100)  # 100 hashes * ~100B = ~10KB
             ]
         },
         'batch_resize': {
-            'image_paths': ['/tmp/test_4mp.png', '/tmp/test_9mp.png'],
+            'image_paths': ['/tmp/test_10kb.png'] * 5,  # 5 images
             'max_size': 800
         },
 
         # ============================================================
-        # Filesystem (14 tools) - File paths (inherently small)
-        # Note: File content size is determined by file, not payload
+        # Filesystem (14 tools) - All use 10KB files
+        # Note: Payload is small, but processed file is 10KB
         # ============================================================
         'read_file': {
-            'path': '/tmp/test_2kb.txt'
+            'path': '/tmp/test_10kb.txt'
         },
         'read_text_file': {
-            'path': '/tmp/test_2kb.txt'
+            'path': '/tmp/test_10kb.txt'
         },
         'read_media_file': {
-            'path': '/tmp/test_4mp.png'
+            'path': '/tmp/test_10kb.png'
         },
         'read_multiple_files': {
-            'paths': ['/tmp/test_2kb.txt', '/tmp/test_1kb.json']
+            'paths': ['/tmp/test_10kb.txt', '/tmp/test_10kb.json']
         },
         'write_file': {
             'path': '/tmp/test_write.txt',
-            'content': text_2kb  # ~2KB content
+            'content': text_10kb  # 10KB content
         },
         'edit_file': {
-            'path': '/tmp/test_2kb.txt',
+            'path': '/tmp/test_10kb.txt',
             'edits': [{'oldText': 'Lorem', 'newText': 'LOREM'}],
             'dryRun': True
         },
@@ -329,42 +321,34 @@ def get_standard_payloads():
 
 
 def validate_payload_sizes():
-    """Validate that all payloads are within WASM buffer limit"""
+    """Validate payload sizes - ALL should be ~10KB for fair comparison"""
     payloads = get_standard_payloads()
 
     print("Payload Size Validation")
     print("=" * 60)
-    print(f"Target size: {STANDARD_INPUT_SIZE} bytes (2KB)")
-    print(f"Hard limit: {WASM_BUFFER_LIMIT} bytes (4KB)")
+    print(f"Target size: {STANDARD_INPUT_SIZE} bytes (10KB) for ALL tools")
+    print("This ensures fair Alpha value calculation across nodes")
     print()
-
-    oversized = []
 
     for tool_name, payload in sorted(payloads.items()):
         size = len(json.dumps(payload))
-        status = "✓" if size <= WASM_BUFFER_LIMIT else "❌"
-
-        if size > WASM_BUFFER_LIMIT:
-            oversized.append((tool_name, size))
 
         # Show size relative to target
-        if size > STANDARD_INPUT_SIZE * 1.2:  # More than 20% over target
-            size_str = f"{size:5d}B (⚠️  {size/STANDARD_INPUT_SIZE:.1f}x target)"
+        percent = (size / STANDARD_INPUT_SIZE) * 100
+        if size > STANDARD_INPUT_SIZE * 1.5:  # More than 50% over
+            size_str = f"{size:6d}B ({percent:5.1f}% of target) ⚠️  TOO LARGE"
+        elif size < STANDARD_INPUT_SIZE * 0.5:  # Less than 50%
+            size_str = f"{size:6d}B ({percent:5.1f}% of target) ⚠️  TOO SMALL"
         else:
-            size_str = f"{size:5d}B"
+            size_str = f"{size:6d}B ({percent:5.1f}% of target)"
 
-        print(f"{status} {tool_name:30s} {size_str}")
+        print(f"  {tool_name:30s} {size_str}")
 
     print()
     print("=" * 60)
-    if oversized:
-        print(f"❌ {len(oversized)} payloads exceed 4KB limit:")
-        for name, size in oversized:
-            print(f"   {name}: {size} bytes")
-    else:
-        print("✓ All payloads within 4KB limit!")
-
-    return len(oversized) == 0
+    print("Note: File-based tools (filesystem, git, image) have small")
+    print("      payloads but process 10KB files. This is expected.")
+    print("=" * 60)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,562 @@
+[
+  {
+    "id": 0,
+    "timestamp": "2024-12-01T00:00:00",
+    "value": 431,
+    "category": "E",
+    "name": "item_0"
+  },
+  {
+    "id": 1,
+    "timestamp": "2024-12-01T01:00:00",
+    "value": 356,
+    "category": "D",
+    "name": "item_1"
+  },
+  {
+    "id": 2,
+    "timestamp": "2024-12-01T02:00:00",
+    "value": 759,
+    "category": "D",
+    "name": "item_2"
+  },
+  {
+    "id": 3,
+    "timestamp": "2024-12-01T03:00:00",
+    "value": 749,
+    "category": "B",
+    "name": "item_3"
+  },
+  {
+    "id": 4,
+    "timestamp": "2024-12-01T04:00:00",
+    "value": 385,
+    "category": "E",
+    "name": "item_4"
+  },
+  {
+    "id": 5,
+    "timestamp": "2024-12-01T05:00:00",
+    "value": 780,
+    "category": "C",
+    "name": "item_5"
+  },
+  {
+    "id": 6,
+    "timestamp": "2024-12-01T06:00:00",
+    "value": 239,
+    "category": "D",
+    "name": "item_6"
+  },
+  {
+    "id": 7,
+    "timestamp": "2024-12-01T07:00:00",
+    "value": 783,
+    "category": "B",
+    "name": "item_7"
+  },
+  {
+    "id": 8,
+    "timestamp": "2024-12-01T08:00:00",
+    "value": 383,
+    "category": "C",
+    "name": "item_8"
+  },
+  {
+    "id": 9,
+    "timestamp": "2024-12-01T09:00:00",
+    "value": 922,
+    "category": "D",
+    "name": "item_9"
+  },
+  {
+    "id": 10,
+    "timestamp": "2024-12-01T10:00:00",
+    "value": 148,
+    "category": "D",
+    "name": "item_10"
+  },
+  {
+    "id": 11,
+    "timestamp": "2024-12-01T11:00:00",
+    "value": 890,
+    "category": "C",
+    "name": "item_11"
+  },
+  {
+    "id": 12,
+    "timestamp": "2024-12-01T12:00:00",
+    "value": 728,
+    "category": "E",
+    "name": "item_12"
+  },
+  {
+    "id": 13,
+    "timestamp": "2024-12-01T13:00:00",
+    "value": 820,
+    "category": "A",
+    "name": "item_13"
+  },
+  {
+    "id": 14,
+    "timestamp": "2024-12-01T14:00:00",
+    "value": 710,
+    "category": "A",
+    "name": "item_14"
+  },
+  {
+    "id": 15,
+    "timestamp": "2024-12-01T15:00:00",
+    "value": 173,
+    "category": "B",
+    "name": "item_15"
+  },
+  {
+    "id": 16,
+    "timestamp": "2024-12-01T16:00:00",
+    "value": 311,
+    "category": "E",
+    "name": "item_16"
+  },
+  {
+    "id": 17,
+    "timestamp": "2024-12-01T17:00:00",
+    "value": 846,
+    "category": "C",
+    "name": "item_17"
+  },
+  {
+    "id": 18,
+    "timestamp": "2024-12-01T18:00:00",
+    "value": 584,
+    "category": "E",
+    "name": "item_18"
+  },
+  {
+    "id": 19,
+    "timestamp": "2024-12-01T19:00:00",
+    "value": 764,
+    "category": "E",
+    "name": "item_19"
+  },
+  {
+    "id": 20,
+    "timestamp": "2024-12-01T20:00:00",
+    "value": 974,
+    "category": "E",
+    "name": "item_20"
+  },
+  {
+    "id": 21,
+    "timestamp": "2024-12-01T21:00:00",
+    "value": 709,
+    "category": "E",
+    "name": "item_21"
+  },
+  {
+    "id": 22,
+    "timestamp": "2024-12-01T22:00:00",
+    "value": 341,
+    "category": "B",
+    "name": "item_22"
+  },
+  {
+    "id": 23,
+    "timestamp": "2024-12-01T23:00:00",
+    "value": 221,
+    "category": "D",
+    "name": "item_23"
+  },
+  {
+    "id": 24,
+    "timestamp": "2024-12-02T00:00:00",
+    "value": 907,
+    "category": "A",
+    "name": "item_24"
+  },
+  {
+    "id": 25,
+    "timestamp": "2024-12-02T01:00:00",
+    "value": 340,
+    "category": "A",
+    "name": "item_25"
+  },
+  {
+    "id": 26,
+    "timestamp": "2024-12-02T02:00:00",
+    "value": 445,
+    "category": "A",
+    "name": "item_26"
+  },
+  {
+    "id": 27,
+    "timestamp": "2024-12-02T03:00:00",
+    "value": 596,
+    "category": "B",
+    "name": "item_27"
+  },
+  {
+    "id": 28,
+    "timestamp": "2024-12-02T04:00:00",
+    "value": 388,
+    "category": "E",
+    "name": "item_28"
+  },
+  {
+    "id": 29,
+    "timestamp": "2024-12-02T05:00:00",
+    "value": 552,
+    "category": "E",
+    "name": "item_29"
+  },
+  {
+    "id": 30,
+    "timestamp": "2024-12-02T06:00:00",
+    "value": 731,
+    "category": "A",
+    "name": "item_30"
+  },
+  {
+    "id": 31,
+    "timestamp": "2024-12-02T07:00:00",
+    "value": 490,
+    "category": "D",
+    "name": "item_31"
+  },
+  {
+    "id": 32,
+    "timestamp": "2024-12-02T08:00:00",
+    "value": 296,
+    "category": "B",
+    "name": "item_32"
+  },
+  {
+    "id": 33,
+    "timestamp": "2024-12-02T09:00:00",
+    "value": 160,
+    "category": "E",
+    "name": "item_33"
+  },
+  {
+    "id": 34,
+    "timestamp": "2024-12-02T10:00:00",
+    "value": 418,
+    "category": "B",
+    "name": "item_34"
+  },
+  {
+    "id": 35,
+    "timestamp": "2024-12-02T11:00:00",
+    "value": 382,
+    "category": "D",
+    "name": "item_35"
+  },
+  {
+    "id": 36,
+    "timestamp": "2024-12-02T12:00:00",
+    "value": 461,
+    "category": "D",
+    "name": "item_36"
+  },
+  {
+    "id": 37,
+    "timestamp": "2024-12-02T13:00:00",
+    "value": 519,
+    "category": "D",
+    "name": "item_37"
+  },
+  {
+    "id": 38,
+    "timestamp": "2024-12-02T14:00:00",
+    "value": 776,
+    "category": "D",
+    "name": "item_38"
+  },
+  {
+    "id": 39,
+    "timestamp": "2024-12-02T15:00:00",
+    "value": 407,
+    "category": "E",
+    "name": "item_39"
+  },
+  {
+    "id": 40,
+    "timestamp": "2024-12-02T16:00:00",
+    "value": 797,
+    "category": "A",
+    "name": "item_40"
+  },
+  {
+    "id": 41,
+    "timestamp": "2024-12-02T17:00:00",
+    "value": 897,
+    "category": "A",
+    "name": "item_41"
+  },
+  {
+    "id": 42,
+    "timestamp": "2024-12-02T18:00:00",
+    "value": 626,
+    "category": "E",
+    "name": "item_42"
+  },
+  {
+    "id": 43,
+    "timestamp": "2024-12-02T19:00:00",
+    "value": 678,
+    "category": "C",
+    "name": "item_43"
+  },
+  {
+    "id": 44,
+    "timestamp": "2024-12-02T20:00:00",
+    "value": 764,
+    "category": "A",
+    "name": "item_44"
+  },
+  {
+    "id": 45,
+    "timestamp": "2024-12-02T21:00:00",
+    "value": 453,
+    "category": "A",
+    "name": "item_45"
+  },
+  {
+    "id": 46,
+    "timestamp": "2024-12-02T22:00:00",
+    "value": 844,
+    "category": "E",
+    "name": "item_46"
+  },
+  {
+    "id": 47,
+    "timestamp": "2024-12-02T23:00:00",
+    "value": 459,
+    "category": "E",
+    "name": "item_47"
+  },
+  {
+    "id": 48,
+    "timestamp": "2024-12-03T00:00:00",
+    "value": 559,
+    "category": "E",
+    "name": "item_48"
+  },
+  {
+    "id": 49,
+    "timestamp": "2024-12-03T01:00:00",
+    "value": 330,
+    "category": "B",
+    "name": "item_49"
+  },
+  {
+    "id": 50,
+    "timestamp": "2024-12-03T02:00:00",
+    "value": 260,
+    "category": "B",
+    "name": "item_50"
+  },
+  {
+    "id": 51,
+    "timestamp": "2024-12-03T03:00:00",
+    "value": 604,
+    "category": "A",
+    "name": "item_51"
+  },
+  {
+    "id": 52,
+    "timestamp": "2024-12-03T04:00:00",
+    "value": 143,
+    "category": "E",
+    "name": "item_52"
+  },
+  {
+    "id": 53,
+    "timestamp": "2024-12-03T05:00:00",
+    "value": 324,
+    "category": "B",
+    "name": "item_53"
+  },
+  {
+    "id": 54,
+    "timestamp": "2024-12-03T06:00:00",
+    "value": 866,
+    "category": "A",
+    "name": "item_54"
+  },
+  {
+    "id": 55,
+    "timestamp": "2024-12-03T07:00:00",
+    "value": 279,
+    "category": "E",
+    "name": "item_55"
+  },
+  {
+    "id": 56,
+    "timestamp": "2024-12-03T08:00:00",
+    "value": 417,
+    "category": "D",
+    "name": "item_56"
+  },
+  {
+    "id": 57,
+    "timestamp": "2024-12-03T09:00:00",
+    "value": 722,
+    "category": "E",
+    "name": "item_57"
+  },
+  {
+    "id": 58,
+    "timestamp": "2024-12-03T10:00:00",
+    "value": 633,
+    "category": "B",
+    "name": "item_58"
+  },
+  {
+    "id": 59,
+    "timestamp": "2024-12-03T11:00:00",
+    "value": 446,
+    "category": "E",
+    "name": "item_59"
+  },
+  {
+    "id": 60,
+    "timestamp": "2024-12-03T12:00:00",
+    "value": 988,
+    "category": "C",
+    "name": "item_0"
+  },
+  {
+    "id": 61,
+    "timestamp": "2024-12-03T13:00:00",
+    "value": 417,
+    "category": "C",
+    "name": "item_1"
+  },
+  {
+    "id": 62,
+    "timestamp": "2024-12-03T14:00:00",
+    "value": 983,
+    "category": "A",
+    "name": "item_2"
+  },
+  {
+    "id": 63,
+    "timestamp": "2024-12-03T15:00:00",
+    "value": 625,
+    "category": "D",
+    "name": "item_3"
+  },
+  {
+    "id": 64,
+    "timestamp": "2024-12-03T16:00:00",
+    "value": 772,
+    "category": "E",
+    "name": "item_4"
+  },
+  {
+    "id": 65,
+    "timestamp": "2024-12-03T17:00:00",
+    "value": 811,
+    "category": "C",
+    "name": "item_5"
+  },
+  {
+    "id": 66,
+    "timestamp": "2024-12-03T18:00:00",
+    "value": 226,
+    "category": "B",
+    "name": "item_6"
+  },
+  {
+    "id": 67,
+    "timestamp": "2024-12-03T19:00:00",
+    "value": 982,
+    "category": "D",
+    "name": "item_7"
+  },
+  {
+    "id": 68,
+    "timestamp": "2024-12-03T20:00:00",
+    "value": 299,
+    "category": "E",
+    "name": "item_8"
+  },
+  {
+    "id": 69,
+    "timestamp": "2024-12-03T21:00:00",
+    "value": 653,
+    "category": "E",
+    "name": "item_9"
+  },
+  {
+    "id": 70,
+    "timestamp": "2024-12-03T22:00:00",
+    "value": 247,
+    "category": "A",
+    "name": "item_10"
+  },
+  {
+    "id": 71,
+    "timestamp": "2024-12-03T23:00:00",
+    "value": 114,
+    "category": "C",
+    "name": "item_11"
+  },
+  {
+    "id": 72,
+    "timestamp": "2024-12-04T00:00:00",
+    "value": 318,
+    "category": "A",
+    "name": "item_12"
+  },
+  {
+    "id": 73,
+    "timestamp": "2024-12-04T01:00:00",
+    "value": 643,
+    "category": "B",
+    "name": "item_13"
+  },
+  {
+    "id": 74,
+    "timestamp": "2024-12-04T02:00:00",
+    "value": 986,
+    "category": "C",
+    "name": "item_14"
+  },
+  {
+    "id": 75,
+    "timestamp": "2024-12-04T03:00:00",
+    "value": 162,
+    "category": "E",
+    "name": "item_15"
+  },
+  {
+    "id": 76,
+    "timestamp": "2024-12-04T04:00:00",
+    "value": 400,
+    "category": "D",
+    "name": "item_16"
+  },
+  {
+    "id": 77,
+    "timestamp": "2024-12-04T05:00:00",
+    "value": 116,
+    "category": "C",
+    "name": "item_17"
+  },
+  {
+    "id": 78,
+    "timestamp": "2024-12-04T06:00:00",
+    "value": 574,
+    "category": "E",
+    "name": "item_18"
+  },
+  {
+    "id": 79,
+    "timestamp": "2024-12-04T07:00:00",
+    "value": 726,
+    "category": "A",
+    "name": "item_19"
+  }
+]
