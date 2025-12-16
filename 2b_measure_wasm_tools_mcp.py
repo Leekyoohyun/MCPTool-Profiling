@@ -223,10 +223,12 @@ async def measure_tool_wasm_mcp(tool_name, server_name, payload, runs=3):
 
     for run in range(runs):
         try:
-            # Create MCP client
-            async with MultiServerMCPClient({server_name: server_config.config}) as client:
+            # Create MCP client (new API as of 0.1.0)
+            client = MultiServerMCPClient({server_name: server_config.config})
+
+            async with client.session(server_name) as session:
                 # Load tools
-                tools = load_mcp_tools(client)
+                tools = await load_mcp_tools(session)
 
                 # Find the tool
                 tool_obj = None
