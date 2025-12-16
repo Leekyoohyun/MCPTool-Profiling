@@ -174,11 +174,11 @@ async def measure_server_tools(server_name, tool_names, test_payloads, runs=3):
                     results.append({
                         'tool_name': tool_name,
                         'server': server_name,
-                        't_exec': avg_exec_time,
+                        't_exec_ms': avg_exec_time * 1000,  # Convert to ms
                         'input_size': input_size,
                         'output_size': output_size,
                         'runs': len(exec_times),
-                        'measurements': exec_times
+                        'measurements_ms': [t * 1000 for t in exec_times]  # Convert to ms
                     })
                     print(f"✓ {avg_exec_time*1000:.1f}ms")
                 else:
