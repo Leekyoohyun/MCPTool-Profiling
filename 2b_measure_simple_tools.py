@@ -155,7 +155,18 @@ async def measure_server_tools(server_name, tool_names, test_payloads, runs=3):
 
                 exec_times = []
                 output_size = 0
-                input_size = sys.getsizeof(json.dumps(payload))
+
+                # Calculate input size based on actual data processed
+                # File-based tools process 50MB files, not just the JSON payload
+                if tool_name in ['get_image_info', 'resize_image', 'compute_image_hash']:
+                    # Single 50MB image file
+                    input_size = 50 * 1024 * 1024
+                elif tool_name == 'batch_resize':
+                    # 5 images × 50MB each
+                    input_size = 5 * 50 * 1024 * 1024
+                else:
+                    # Payload-based tools use JSON size
+                    input_size = sys.getsizeof(json.dumps(payload))
 
                 for run in range(runs):
                     try:
