@@ -90,19 +90,10 @@ def start_wasmtime_server(wasm_file, port=8000):
     Returns:
         subprocess.Popen: Server process
     """
+    import os
+
     # Build command
     cmd = ['wasmtime', 'serve']
-
-    # Add environment variables for API keys
-    env = {}
-    openai_key = ENV_VARS.get('OPENAI_API_KEY', '')
-    anthropic_key = ENV_VARS.get('ANTHROPIC_API_KEY', '')
-
-    if openai_key:
-        env['OPENAI_API_KEY'] = openai_key
-
-    if anthropic_key:
-        env['ANTHROPIC_API_KEY'] = anthropic_key
 
     # Add WASM-specific args
     cmd.extend([
@@ -111,21 +102,31 @@ def start_wasmtime_server(wasm_file, port=8000):
         '--dir=/tmp',
     ])
 
-    # Add env vars
-    for key, value in env.items():
-        cmd.extend(['--env', f'{key}={value}'])
-
     cmd.append(str(wasm_file))
 
     print(f"  Starting wasmtime serve on port {port}...")
     print(f"  Command: {' '.join(cmd)}")
 
-    # Start process
+    # Prepare environment with API keys
+    env = os.environ.copy()
+
+    openai_key = ENV_VARS.get('OPENAI_API_KEY', '')
+    anthropic_key = ENV_VARS.get('ANTHROPIC_API_KEY', '')
+
+    if openai_key:
+        env['OPENAI_API_KEY'] = openai_key
+        print(f"  ✓ Set OPENAI_API_KEY in environment")
+
+    if anthropic_key:
+        env['ANTHROPIC_API_KEY'] = anthropic_key
+        print(f"  ✓ Set ANTHROPIC_API_KEY in environment")
+
+    # Start process with environment variables
     process = subprocess.Popen(
         cmd,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        env={**subprocess.os.environ, **env}
+        env=env
     )
 
     # Wait for server to start (2 seconds)
