@@ -61,26 +61,26 @@ def get_test_payloads():
 
     # Read log content
     try:
-        with open('/tmp/files/test_medium.log', 'r') as f:
+        with open('/tmp/test_medium.log', 'r') as f:
             log_content = f.read()
     except:
         log_content = 'ERROR test\n' * 100
 
     return {
         # Filesystem (14)
-        'read_file': {'path': '/tmp/files/test_medium.txt'},
-        'read_text_file': {'path': '/tmp/files/test_medium.txt'},
-        'read_media_file': {'path': '/tmp/images/size_test/test_4mp.png'},
-        'read_multiple_files': {'paths': ['/tmp/files/test_medium.txt', '/tmp/files/test_medium.json']},
+        'read_file': {'path': '/tmp/test_medium.txt'},
+        'read_text_file': {'path': '/tmp/test_medium.txt'},
+        'read_media_file': {'path': '/tmp/images/test_4mp.png'},
+        'read_multiple_files': {'paths': ['/tmp/test_medium.txt', '/tmp/test_1k.json']},
         'write_file': {'path': '/tmp/test_write.txt', 'content': 'test' * 1000},
-        'edit_file': {'path': '/tmp/files/test_medium.txt', 'edits': [{'oldText': 'the', 'newText': 'THE'}], 'dryRun': True},
+        'edit_file': {'path': '/tmp/test_medium.txt', 'edits': [{'oldText': 'Lorem', 'newText': 'LOREM'}], 'dryRun': True},
         'create_directory': {'path': '/tmp/test_dir_new'},
-        'list_directory': {'path': '/tmp/files'},
-        'list_directory_with_sizes': {'path': '/tmp/files'},
-        'directory_tree': {'path': '/tmp/files'},
+        'list_directory': {'path': '/tmp'},
+        'list_directory_with_sizes': {'path': '/tmp'},
+        'directory_tree': {'path': '/tmp'},
         'move_file': {'source': '/tmp/test_move_src.txt', 'destination': '/tmp/test_move_dst.txt'},
-        'search_files': {'path': '/tmp/files', 'pattern': '*.txt'},
-        'get_file_info': {'path': '/tmp/files/test_medium.txt'},
+        'search_files': {'path': '/tmp', 'pattern': '*.txt'},
+        'get_file_info': {'path': '/tmp/test_medium.txt'},
         'list_allowed_directories': {},
 
         # Git (12)
@@ -89,7 +89,7 @@ def get_test_payloads():
         'git_diff_staged': {'repo_path': '/tmp/git_repo'},
         'git_diff': {'repo_path': '/tmp/git_repo', 'target': 'HEAD~1'},
         'git_commit': {'repo_path': '/tmp/git_repo', 'message': 'test commit'},
-        'git_add': {'repo_path': '/tmp/git_repo', 'files': ['test.txt']},
+        'git_add': {'repo_path': '/tmp/git_repo', 'files': ['README.md']},
         'git_reset': {'repo_path': '/tmp/git_repo'},
         'git_log': {'repo_path': '/tmp/git_repo', 'max_count': 10},
         'git_create_branch': {'repo_path': '/tmp/git_repo', 'branch_name': 'test-branch'},
@@ -183,10 +183,10 @@ def get_test_payloads():
         },
 
         # Image Resize (6)
-        'get_image_info': {'image_path': '/tmp/images/size_test/test_4mp.png'},
-        'resize_image': {'image_path': '/tmp/images/size_test/test_4mp.png', 'max_width': 800, 'max_height': 600},
-        'scan_directory': {'directory': '/tmp/images/size_test'},
-        'compute_image_hash': {'image_path': '/tmp/images/size_test/test_4mp.png'},
+        'get_image_info': {'image_path': '/tmp/images/test_4mp.png'},
+        'resize_image': {'image_path': '/tmp/images/test_4mp.png', 'max_width': 800, 'max_height': 600},
+        'scan_directory': {'directory': '/tmp/images'},
+        'compute_image_hash': {'image_path': '/tmp/images/test_4mp.png'},
         'compare_hashes': {
             'hashes': [
                 'abc123def456',
@@ -195,7 +195,7 @@ def get_test_payloads():
             ]
         },
         'batch_resize': {
-            'image_paths': ['/tmp/images/size_test/test_4mp.png', '/tmp/images/size_test/test_9mp.png'],
+            'image_paths': ['/tmp/images/test_4mp.png', '/tmp/images/test_9mp.png'],
             'max_width': 800,
             'max_height': 600
         },
