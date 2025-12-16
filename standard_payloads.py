@@ -92,7 +92,7 @@ def get_standard_payloads():
         # Note: 5KB is realistic for summarization tasks
         # ============================================================
         'summarize_text': {
-            'text': (STANDARD_TEXT_500B + "\n") * 200,  # ~100KB
+            'text': (STANDARD_TEXT_500B + "\n") * 100,  # ~50KB
             'max_length': 100,
             'style': 'concise'
         },
