@@ -183,10 +183,10 @@ def get_test_payloads():
         },
 
         # Image Resize (6)
-        'get_image_info': {'image_path': '/tmp/images/test_4mp.png'},
-        'resize_image': {'image_path': '/tmp/images/test_4mp.png', 'max_width': 800, 'max_height': 600},
-        'scan_directory': {'directory': '/tmp/images'},
-        'compute_image_hash': {'image_path': '/tmp/images/test_4mp.png'},
+        'get_image_info': {'image_path': '/tmp/test_4mp.png'},
+        'resize_image': {'image_path': '/tmp/test_4mp.png', 'max_width': 800, 'max_height': 600},
+        'scan_directory': {'directory': '/tmp'},
+        'compute_image_hash': {'image_path': '/tmp/test_4mp.png'},
         'compare_hashes': {
             'hashes': [
                 'abc123def456',
@@ -195,7 +195,7 @@ def get_test_payloads():
             ]
         },
         'batch_resize': {
-            'image_paths': ['/tmp/images/test_4mp.png', '/tmp/images/test_9mp.png'],
+            'image_paths': ['/tmp/test_4mp.png', '/tmp/test_9mp.png'],
             'max_width': 800,
             'max_height': 600
         },
@@ -286,8 +286,8 @@ async def measure_server_tools(server_name, tools_to_measure, test_payloads, run
                 else:
                     print(f"    ❌ All runs failed")
 
-        # Give WASM time to clean up
-        await asyncio.sleep(0.5)
+        # Give WASM time to clean up resources
+        await asyncio.sleep(2.0)
 
     except Exception as e:
         print(f"  ❌ Server error: {e}")
