@@ -83,13 +83,14 @@ def get_cpu_info():
     }
 
 
-def measure_gflops(size=2000, iterations=50):
+def measure_gflops(size=2000, iterations=50, runs=3):
     """
-    Measure GFLOPS using numpy matrix multiplication
+    Measure GFLOPS using numpy matrix multiplication (multiple runs, take max)
 
     Args:
         size: Matrix size (NxN)
-        iterations: Number of iterations
+        iterations: Number of iterations per run
+        runs: Number of measurements (default: 3)
 
     Returns:
         gflops: Peak GFLOPS
@@ -102,7 +103,8 @@ def measure_gflops(size=2000, iterations=50):
     print("FLOPS Benchmark")
     print("="*60)
     print(f"Matrix size: {size}x{size}")
-    print(f"Iterations:  {iterations}")
+    print(f"Iterations:  {iterations} per run")
+    print(f"Runs:        {runs}")
     print()
 
     # Create random matrices
@@ -114,29 +116,43 @@ def measure_gflops(size=2000, iterations=50):
     for _ in range(5):
         c = np.dot(a, b)
 
-    # Benchmark
+    # Benchmark multiple times
     print("Running benchmark...")
-    start = time.time()
-    for _ in range(iterations):
-        c = np.dot(a, b)
-    elapsed = time.time() - start
+    gflops_list = []
 
-    # Matrix multiply: 2*N^3 FLOPs per iteration
-    total_flops = 2 * (size ** 3) * iterations
-    gflops = total_flops / elapsed / 1e9
+    for i in range(runs):
+        start = time.time()
+        for _ in range(iterations):
+            c = np.dot(a, b)
+        elapsed = time.time() - start
 
-    print(f"✓ Peak GFLOPS: {gflops:.2f}")
-    print(f"  Total time: {elapsed:.2f}s")
+        # Matrix multiply: 2*N^3 FLOPs per iteration
+        total_flops = 2 * (size ** 3) * iterations
+        gflops = total_flops / elapsed / 1e9
+        gflops_list.append(gflops)
 
-    return gflops
+        print(f"  Run {i+1}/{runs}: {gflops:.2f} GFLOPS ({elapsed:.2f}s)")
+
+    peak_gflops = max(gflops_list)
+    avg_gflops = sum(gflops_list) / len(gflops_list)
+
+    print()
+    print(f"✓ Peak GFLOPS: {peak_gflops:.2f}")
+    print(f"  Average: {avg_gflops:.2f}")
+    print(f"  Min: {min(gflops_list):.2f}, Max: {max(gflops_list):.2f}")
+
+    return peak_gflops
 
 
-def measure_memory_bandwidth():
+def measure_memory_bandwidth(runs=3):
     """
-    Measure memory bandwidth using sysbench
+    Measure memory bandwidth using sysbench (multiple runs, take max)
+
+    Args:
+        runs: Number of measurements (default: 3)
 
     Returns:
-        bandwidth_mbps: Memory bandwidth in MiB/sec
+        bandwidth_mbps: Peak memory bandwidth in MiB/sec
     """
     print("\n" + "="*60)
     print("Memory Bandwidth Benchmark")
@@ -153,38 +169,52 @@ def measure_memory_bandwidth():
         print("⚠️  sysbench not available")
         return None
 
-    try:
-        # Run sysbench memory test
-        cmd = [
-            'sysbench', 'memory',
-            '--memory-block-size=1M',
-            '--memory-total-size=10G',
-            'run'
-        ]
+    print(f"Running {runs} measurements (taking peak)...")
+    print()
 
-        print("Running sysbench memory test (10GB)...")
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+    bandwidths = []
 
-        if result.returncode == 0:
-            # Parse output for bandwidth
-            # Look for: "10240.00 MiB transferred (37472.03 MiB/sec)"
-            match = re.search(r'\((\d+\.?\d*)\s+MiB/sec\)', result.stdout)
-            if match:
-                bandwidth_mibps = float(match.group(1))
-                print(f"✓ Memory Bandwidth: {bandwidth_mibps:.2f} MiB/sec ({bandwidth_mibps/1024:.2f} GiB/sec)")
-                return bandwidth_mibps
+    for i in range(runs):
+        try:
+            # Run sysbench memory test
+            cmd = [
+                'sysbench', 'memory',
+                '--memory-block-size=1M',
+                '--memory-total-size=10G',
+                'run'
+            ]
+
+            print(f"  Run {i+1}/{runs}...", end=' ', flush=True)
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+
+            if result.returncode == 0:
+                # Parse output for bandwidth
+                # Look for: "10240.00 MiB transferred (37472.03 MiB/sec)"
+                match = re.search(r'\((\d+\.?\d*)\s+MiB/sec\)', result.stdout)
+                if match:
+                    bandwidth_mibps = float(match.group(1))
+                    bandwidths.append(bandwidth_mibps)
+                    print(f"{bandwidth_mibps:.2f} MiB/sec")
+                else:
+                    print("⚠️  Could not parse output")
             else:
-                print("⚠️  Could not parse sysbench output")
-                return None
-        else:
-            print(f"⚠️  sysbench failed: {result.stderr}")
-            return None
+                print(f"⚠️  Failed: {result.stderr}")
 
-    except subprocess.TimeoutExpired:
-        print("⚠️  Memory test timed out")
-        return None
-    except Exception as e:
-        print(f"⚠️  Memory test error: {e}")
+        except subprocess.TimeoutExpired:
+            print("⚠️  Timed out")
+        except Exception as e:
+            print(f"⚠️  Error: {e}")
+
+    if bandwidths:
+        peak_bw = max(bandwidths)
+        avg_bw = sum(bandwidths) / len(bandwidths)
+        print()
+        print(f"✓ Peak Memory Bandwidth: {peak_bw:.2f} MiB/sec ({peak_bw/1024:.2f} GiB/sec)")
+        print(f"  Average: {avg_bw:.2f} MiB/sec ({avg_bw/1024:.2f} GiB/sec)")
+        print(f"  Min: {min(bandwidths):.2f}, Max: {max(bandwidths):.2f}")
+        return peak_bw
+    else:
+        print("⚠️  All measurements failed")
         return None
 
 
