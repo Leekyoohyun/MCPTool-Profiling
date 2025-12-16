@@ -48,6 +48,9 @@ from mcp_comparator import MCPServerConfig, TransportType
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_mcp_adapters.tools import load_mcp_tools
 
+# Import standard payloads
+from standard_payloads import get_standard_payloads
+
 # WASM path
 WASM_PATH_CANDIDATES = [
     Path.home() / "EdgeAgent/wasm_mcp/target/wasm32-wasip2/release",  # Nodes
@@ -74,135 +77,8 @@ SERVER_WASM_MAP = {
     'image_resize': 'mcp_server_image_resize.wasm',
 }
 
-# Simple test payloads
-def get_test_payloads():
-    """Generate test payloads"""
-
-    # Read log content
-    try:
-        with open('/tmp/test_medium.log', 'r') as f:
-            log_content = f.read()
-    except:
-        log_content = 'ERROR test\n' * 100
-
-    return {
-        # Time (2)
-        'get_current_time': {'timezone': 'Asia/Seoul'},
-        'convert_time': {
-            'source_timezone': 'Asia/Seoul',
-            'time': '12:00',
-            'target_timezone': 'America/New_York'
-        },
-
-        # Sequential Thinking (1)
-        'sequentialthinking': {
-            'thought': 'Analyzing edge computing resource allocation',
-            'nextThoughtNeeded': False,
-            'thoughtNumber': 1,
-            'totalThoughts': 1
-        },
-
-        # Fetch (1)
-        'fetch': {'url': 'https://example.com'},
-
-        # Summarize (3)
-        'summarize_text': {
-            'text': 'Lorem ipsum dolor sit amet. ' * 500,
-            'max_length': 100
-        },
-        'summarize_documents': {
-            'documents': [
-                {'title': 'doc1', 'content': 'Lorem ipsum ' * 200},
-                {'title': 'doc2', 'content': 'Dolor sit amet ' * 200}
-            ]
-        },
-        'get_provider_info': {},
-
-        # Log Parser (5)
-        'parse_logs': {
-            'log_content': log_content,
-            'format_type': 'auto'
-        },
-        'filter_entries': {
-            'entries': [
-                {'level': 'ERROR', 'message': 'Error occurred'},
-                {'level': 'WARNING', 'message': 'Warning message'},
-                {'level': 'INFO', 'message': 'Info message'}
-            ],
-            'min_level': 'WARNING'
-        },
-        'compute_log_statistics': {
-            'entries': [{'level': 'ERROR', 'message': f'test {i}'} for i in range(100)]
-        },
-        'search_entries': {
-            'entries': [
-                {'message': 'test error occurred'},
-                {'message': 'test warning'},
-                {'message': 'normal message'}
-            ],
-            'pattern': 'error'
-        },
-        'extract_time_range': {
-            'entries': [
-                {'timestamp': '2024-01-01T00:00:00Z', 'message': 'test1'},
-                {'timestamp': '2024-01-01T12:00:00Z', 'message': 'test2'},
-                {'timestamp': '2024-01-02T00:00:00Z', 'message': 'test3'}
-            ]
-        },
-
-        # Data Aggregate (5)
-        'aggregate_list': {
-            'items': [{'type': chr(65 + i % 5), 'value': i * 10} for i in range(1000)]
-        },
-        'merge_summaries': {
-            'summaries': [
-                {'category': 'A', 'count': 10, 'total': 100},
-                {'category': 'B', 'count': 20, 'total': 200},
-                {'category': 'A', 'count': 5, 'total': 50}
-            ]
-        },
-        'combine_research_results': {
-            'results': [
-                {'source': 'Database A', 'data': 'Result set 1 with ' + 'data ' * 50},
-                {'source': 'Database B', 'data': 'Result set 2 with ' + 'data ' * 50},
-                {'source': 'API C', 'data': 'Result set 3 with ' + 'data ' * 50}
-            ]
-        },
-        'deduplicate': {
-            'items': [
-                {'id': 1, 'name': 'item1'},
-                {'id': 2, 'name': 'item2'},
-                {'id': 1, 'name': 'item1'},
-                {'id': 3, 'name': 'item3'},
-                {'id': 2, 'name': 'item2'}
-            ],
-            'key_fields': ['id']
-        },
-        'compute_trends': {
-            'time_series': [
-                {'timestamp': f'2024-01-{i:02d}', 'value': 10 + i * 2}
-                for i in range(1, 31)
-            ]
-        },
-
-        # Image Resize (6)
-        'get_image_info': {'image_path': '/tmp/test_4mp.png'},
-        'resize_image': {'image_path': '/tmp/test_4mp.png', 'max_size': 800},
-        'compute_image_hash': {'image_path': '/tmp/test_4mp.png'},
-        'compare_hashes': {
-            'hashes': [
-                {'hash': 'abc123def456', 'path': '/tmp/test_4mp.png'},
-                {'hash': 'abc124def456', 'path': '/tmp/test_9mp.png'},
-                {'hash': '123456789abc', 'path': '/tmp/test_16mp.png'}
-            ]
-        },
-        'batch_resize': {
-            'image_paths': ['/tmp/test_4mp.png', '/tmp/test_9mp.png'],
-            'max_size': 800
-        },
-        # scan_directory는 permission denied로 제외
-    }
-
+# Note: Using standard payloads from standard_payloads.py
+# All payloads are standardized to ~2KB for fair comparison across nodes
 
 # Tool definitions (no git/filesystem)
 TOOLS_BY_SERVER = {
@@ -333,7 +209,7 @@ async def main():
     print(f"Total tools to measure: {total_tools}")
     print()
 
-    test_payloads = get_test_payloads()
+    test_payloads = get_standard_payloads()
     all_results = []
 
     # Measure each server
