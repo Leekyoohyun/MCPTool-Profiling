@@ -73,7 +73,7 @@ def get_standard_payloads():
         # Sequential Thinking (1 tool) - 10KB thought
         # ============================================================
         'sequentialthinking': {
-            'thought': text_3p5kb,
+            'thought': text_1mb,
             'nextThoughtNeeded': False,
             'thoughtNumber': 1,
             'totalThoughts': 1
@@ -90,7 +90,7 @@ def get_standard_payloads():
         # Summarize (3 tools) - All 10KB input
         # ============================================================
         'summarize_text': {
-            'text': text_3p5kb,
+            'text': text_1mb,
             'max_length': 100
         },
         'summarize_documents': {
@@ -105,7 +105,7 @@ def get_standard_payloads():
         # Log Parser (5 tools) - All 10KB input
         # ============================================================
         'parse_logs': {
-            'log_content': log_entries_3p5kb,
+            'log_content': log_entries_1mb,
             'format_type': 'auto'
         },
         'filter_entries': {
@@ -152,7 +152,7 @@ def get_standard_payloads():
         # Data Aggregate (5 tools) - All 10KB input
         # ============================================================
         'aggregate_list': {
-            'items': list_items_42,  # 120 items = ~10KB
+            'items': list_items_12k,  # 120 items = ~10KB
             'group_by': 'category'
         },
         'merge_summaries': {
@@ -188,7 +188,7 @@ def get_standard_payloads():
             'key_fields': ['name']
         },
         'compute_trends': {
-            'time_series': list_items_42,  # 120 items = ~10KB
+            'time_series': list_items_12k,  # 120 items = ~10KB
             'bucket_count': 10
         },
 
@@ -238,7 +238,7 @@ def get_standard_payloads():
         },
         'write_file': {
             'path': '/tmp/test_write.txt',
-            'content': text_3p5kb  # 10KB content
+            'content': text_1mb  # 10KB content
         },
         'edit_file': {
             'path': '/tmp/test_50mb.txt',
