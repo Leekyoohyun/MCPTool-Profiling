@@ -42,13 +42,8 @@ def load_env_file(env_path=None):
 # Load API keys
 ENV_VARS = load_env_file()
 
-# Import EdgeAgent's MCP comparator framework
-sys.path.insert(0, str(Path.home() / "EdgeAgent/wasm_mcp/tests"))
-from mcp_comparator import MCPServerConfig, TransportType
-
-# Import MCP client
-from langchain_mcp_adapters.client import MultiServerMCPClient
-from langchain_mcp_adapters.tools import load_mcp_tools
+# HTTP client for direct JSON-RPC calls (wasmtime serve uses plain HTTP, not MCP streamable)
+import httpx
 
 # Import standard payloads
 from standard_payloads import get_standard_payloads
@@ -165,8 +160,30 @@ def stop_wasmtime_server(process):
             process.wait()
 
 
+async def call_tool_jsonrpc(client: httpx.AsyncClient, url: str, tool_name: str, arguments: dict) -> dict:
+    """Call a tool via JSON-RPC over HTTP"""
+    request_id = int(time.time() * 1000)
+    payload = {
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+            "name": tool_name,
+            "arguments": arguments
+        },
+        "id": request_id
+    }
+    response = await client.post(url, json=payload)
+    response.raise_for_status()
+    result = response.json()
+
+    if "error" in result:
+        raise Exception(result["error"].get("message", str(result["error"])))
+
+    return result.get("result", {})
+
+
 async def measure_server_tools(server_name, tool_names, test_payloads, port=8000, runs=3):
-    """Measure all tools for a single server via HTTP"""
+    """Measure all tools for a single server via HTTP (direct JSON-RPC)"""
 
     wasm_file = WASM_PATH / SERVER_WASM_MAP.get(server_name)
     if not wasm_file.exists():
@@ -185,43 +202,50 @@ async def measure_server_tools(server_name, tool_names, test_payloads, port=8000
         print(f"  ❌ Failed to start HTTP server")
         return []
 
+    url = f"http://127.0.0.1:{port}"
+
     try:
-        # Create HTTP MCP server config
-        server_config = MCPServerConfig.wasmmcp_http(url=f"http://127.0.0.1:{port}")
-
-        # Create client
-        client = MultiServerMCPClient({server_name: server_config.config})
-
-        async with client.session(server_name) as session:
-            tools = await load_mcp_tools(session)
-            tool_map = {t.name: t for t in tools}
+        # Use httpx for direct JSON-RPC calls (wasmtime serve uses plain HTTP)
+        async with httpx.AsyncClient(timeout=120.0) as client:
+            # Verify server is responding
+            try:
+                test_resp = await client.post(url, json={
+                    "jsonrpc": "2.0", "method": "tools/list", "id": 1
+                })
+                if test_resp.status_code != 200:
+                    print(f"  ❌ Server not responding properly")
+                    return []
+                available_tools = [t["name"] for t in test_resp.json().get("result", {}).get("tools", [])]
+                print(f"  Available tools: {available_tools}")
+            except Exception as e:
+                print(f"  ❌ Failed to connect to server: {e}")
+                return []
 
             for tool_name in tool_names:
                 if tool_name not in test_payloads:
                     print(f"  ⚠️  {tool_name}: No test payload")
                     continue
 
-                if tool_name not in tool_map:
+                if tool_name not in available_tools:
                     print(f"  ⚠️  {tool_name}: Not found in server")
                     continue
 
                 print(f"  Measuring {tool_name}...", end=' ', flush=True)
 
-                tool_obj = tool_map[tool_name]
                 payload = test_payloads[tool_name]
+                input_size = len(json.dumps(payload))
 
                 exec_times = []
                 output_size = 0
-                input_size = sys.getsizeof(json.dumps(payload))
 
                 for run in range(runs):
                     try:
                         start = time.time()
-                        result = await tool_obj.ainvoke(payload)
+                        result = await call_tool_jsonrpc(client, url, tool_name, payload)
                         end = time.time()
 
                         exec_times.append(end - start)
-                        output_size = sys.getsizeof(json.dumps(result))
+                        output_size = len(json.dumps(result))
                     except Exception as e:
                         print(f"\n    Run {run+1} failed: {e}")
                         continue
@@ -243,10 +267,12 @@ async def measure_server_tools(server_name, tool_names, test_payloads, port=8000
                     print(f"❌ All runs failed")
 
         # Cleanup delay
-        await asyncio.sleep(1.0)
+        await asyncio.sleep(0.5)
 
     except Exception as e:
         print(f"  ❌ Client error: {e}")
+        import traceback
+        traceback.print_exc()
 
     finally:
         # Stop server
