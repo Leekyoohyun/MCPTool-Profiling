@@ -206,6 +206,12 @@ async def measure_tool_wasm_mcp(tool_name, server_name, payload, runs=3):
     """Measure WASM tool using MCP client"""
     print(f"  Measuring {tool_name} (WASM via MCP)...")
 
+    # Skip servers that require HTTP (not supported in stdio transport)
+    http_required_servers = {'fetch', 'summarize'}
+    if server_name in http_required_servers:
+        print(f"    ⚠️  Skipped: {server_name} requires HTTP (not available in stdio)")
+        return None
+
     # Get WASM file
     wasm_file = WASM_PATH / SERVER_WASM_MAP.get(server_name)
 
