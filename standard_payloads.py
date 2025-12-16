@@ -212,10 +212,11 @@ def get_standard_payloads():
         'compare_hashes': {
             'hashes': [
                 {
-                    'hash': f'hash_{i:04d}_' + 'a' * 50,
+                    # Valid 16-char hex hash (imagehash format)
+                    'hash': f'{i:016x}',
                     'path': f'/tmp/image_{i}.png'
                 }
-                for i in range(480000)  # 480k hashes * ~100B = ~50MB
+                for i in range(600000)  # 600k hashes * ~80B = ~50MB
             ]
         },
         'batch_resize': {

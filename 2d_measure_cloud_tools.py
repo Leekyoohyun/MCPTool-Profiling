@@ -91,8 +91,42 @@ PYTHON_SERVERS = {
     'summarize': 'summarize_server.py',
 }
 
-# Tools by server (Python servers only - no NPM servers for cloud)
+# NPM-based MCP servers
+NPM_SERVERS = {
+    'filesystem': {
+        'command': 'npx',
+        'args': ['-y', '@modelcontextprotocol/server-filesystem', '/tmp'],
+    },
+    'git': {
+        'command': 'npx',
+        'args': ['-y', '@modelcontextprotocol/server-git', '--repository', '/tmp/git_repo'],
+    },
+    'fetch': {
+        'command': 'npx',
+        'args': ['-y', '@modelcontextprotocol/server-fetch'],
+    },
+    'time': {
+        'command': 'npx',
+        'args': ['-y', '@modelcontextprotocol/server-time'],
+    },
+    'sequentialthinking': {
+        'command': 'npx',
+        'args': ['-y', '@modelcontextprotocol/server-sequential-thinking'],
+    },
+}
+
+# Tools by server - ALL servers (same as Edge measurement)
 TOOLS_BY_SERVER = {
+    # NPM servers
+    'time': ['get_current_time', 'convert_time'],
+    'sequentialthinking': ['sequentialthinking'],
+    'fetch': ['fetch'],
+    'filesystem': ['read_file', 'read_text_file', 'read_media_file', 'read_multiple_files', 'write_file',
+                   'edit_file', 'create_directory', 'list_directory', 'list_directory_with_sizes',
+                   'move_file', 'list_allowed_directories'],
+    'git': ['git_status', 'git_diff_unstaged', 'git_diff_staged', 'git_diff', 'git_commit',
+            'git_add', 'git_reset', 'git_log', 'git_show', 'git_branch'],
+    # Python servers
     'log_parser': ['parse_logs', 'filter_entries', 'compute_log_statistics', 'search_entries', 'extract_time_range'],
     'data_aggregate': ['aggregate_list', 'merge_summaries', 'combine_research_results', 'deduplicate', 'compute_trends'],
     'image_resize': ['get_image_info', 'resize_image', 'compute_image_hash', 'compare_hashes', 'batch_resize'],
@@ -132,28 +166,38 @@ async def measure_tool(session, tool_name, arguments, runs=NUM_RUNS):
 async def measure_server_tools(server_name, tool_names, test_payloads, runs=NUM_RUNS):
     """Measure all tools for a single server"""
 
-    if server_name not in PYTHON_SERVERS:
+    # Determine server type and create params
+    if server_name in PYTHON_SERVERS:
+        server_file = EDGEAGENT_PATH / 'servers' / PYTHON_SERVERS[server_name]
+        if not server_file.exists():
+            print(f"  ⚠️  Server not found: {server_file}")
+            return []
+        server_params = StdioServerParameters(
+            command="python3",
+            args=[str(server_file)],
+            env=os.environ.copy()
+        )
+        server_type = "Native Python"
+        server_info = str(server_file)
+    elif server_name in NPM_SERVERS:
+        npm_config = NPM_SERVERS[server_name]
+        server_params = StdioServerParameters(
+            command=npm_config['command'],
+            args=npm_config['args'],
+            env=os.environ.copy()
+        )
+        server_type = "NPM"
+        server_info = f"{npm_config['command']} {' '.join(npm_config['args'][:2])}..."
+    else:
         print(f"  ⚠️  Server not supported: {server_name}")
         return []
 
-    server_file = EDGEAGENT_PATH / 'servers' / PYTHON_SERVERS[server_name]
-    if not server_file.exists():
-        print(f"  ⚠️  Server not found: {server_file}")
-        return []
-
     print(f"\n{'='*60}")
-    print(f"Server: {server_name} ({len(tool_names)} tools) - Native Python")
-    print(f"Path: {server_file}")
+    print(f"Server: {server_name} ({len(tool_names)} tools) - {server_type}")
+    print(f"Command: {server_info}")
     print(f"{'='*60}")
 
     results = []
-
-    # Create server params
-    server_params = StdioServerParameters(
-        command="python3",
-        args=[str(server_file)],
-        env=os.environ.copy()
-    )
 
     try:
         async with stdio_client(server_params) as (read, write):
@@ -179,9 +223,15 @@ async def measure_server_tools(server_name, tool_names, test_payloads, runs=NUM_
 
                     payload = test_payloads[tool_name]
 
-                    # Calculate input size
+                    # Calculate input size (same as Edge measurement)
                     if tool_name in ['get_image_info', 'resize_image', 'compute_image_hash', 'batch_resize']:
                         input_size = 50 * 1024 * 1024  # 50MB image
+                    elif tool_name in ['read_file', 'read_text_file', 'read_media_file']:
+                        input_size = 50 * 1024 * 1024  # 50MB file
+                    elif tool_name == 'read_multiple_files':
+                        input_size = 100 * 1024 * 1024  # 2x 50MB files
+                    elif tool_name == 'sequentialthinking':
+                        input_size = 50 * 1024 * 1024  # Record 50MB for fair comparison
                     else:
                         input_size = len(json.dumps(payload))
 
@@ -225,14 +275,17 @@ async def main():
     servers_path = EDGEAGENT_PATH / 'servers'
     if servers_path.exists():
         print(f"✓ Python servers found at: {servers_path}")
-        # List available servers
         for name, script in PYTHON_SERVERS.items():
             server_file = servers_path / script
             status = "✓" if server_file.exists() else "✗"
             print(f"  {status} {name}: {script}")
     else:
         print(f"⚠️  Python servers not found at: {servers_path}")
-        return
+
+    # Check NPM servers
+    print(f"\n✓ NPM servers (will be downloaded on first use):")
+    for name in NPM_SERVERS.keys():
+        print(f"  ✓ {name}")
     print()
 
     # Count total tools
