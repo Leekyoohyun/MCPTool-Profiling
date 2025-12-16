@@ -69,8 +69,9 @@ if WASM_PATH is None:
     WASM_PATH = WASM_PATH_CANDIDATES[0]
 
 # Server WASM mapping (HTTP로 측정할 도구들)
+# wasmtime serve는 *_http.wasm 버전이 필요 (wasi:http/incoming-handler export)
 SERVER_WASM_MAP = {
-    'summarize': 'mcp_server_summarize.wasm',
+    'summarize': 'mcp_server_summarize_http.wasm',
 }
 
 # Tools to measure via HTTP
