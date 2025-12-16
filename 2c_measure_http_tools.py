@@ -167,7 +167,7 @@ async def measure_server_tools(server_name, tool_names, test_payloads, port=8000
         return []
 
     print(f"\n{'='*60}")
-    print(f"Server: {server_name} ({len(tool_names)} tools) - HTTP")
+    print(f"Server: {server_name} ({len(tool_names)} tools) - HTTP (no 4KB limit)")
     print(f"{'='*60}")
 
     results = []
