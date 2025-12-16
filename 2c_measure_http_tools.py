@@ -110,16 +110,19 @@ def start_wasmtime_server(wasm_file, port=8000):
     # Prepare environment with API keys
     env = os.environ.copy()
 
-    openai_key = ENV_VARS.get('OPENAI_API_KEY', '')
-    anthropic_key = ENV_VARS.get('ANTHROPIC_API_KEY', '')
+    # Try .env file first, then system environment
+    openai_key = ENV_VARS.get('OPENAI_API_KEY', '') or os.environ.get('OPENAI_API_KEY', '')
+    anthropic_key = ENV_VARS.get('ANTHROPIC_API_KEY', '') or os.environ.get('ANTHROPIC_API_KEY', '')
 
     if openai_key:
         env['OPENAI_API_KEY'] = openai_key
-        print(f"  ✓ Set OPENAI_API_KEY in environment")
+        print(f"  ✓ OPENAI_API_KEY: {openai_key[:20]}...")
+    else:
+        print(f"  ⚠️  OPENAI_API_KEY not found (check .env or export)")
 
     if anthropic_key:
         env['ANTHROPIC_API_KEY'] = anthropic_key
-        print(f"  ✓ Set ANTHROPIC_API_KEY in environment")
+        print(f"  ✓ ANTHROPIC_API_KEY: {anthropic_key[:20]}...")
 
     # Start process with environment variables
     process = subprocess.Popen(
